@@ -25,7 +25,7 @@ cam = cv2.VideoCapture(0)
 
 # -------Models---------#
 face_model = dlib.get_frontal_face_detector()
-landmark_model = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+landmark_model = dlib.shape_predictor('/dat/shape_predictor_68_face_landmarks.dat')
 
 # --------Variables-------#
 yawn_thresh = 35
@@ -65,8 +65,11 @@ while True:
 
         # -------Calculating the lip distance-----#
         lip_dist = str(cal_yawn(shape))
-        cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
+        #cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
+        #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
+        if 25 >= cal_yawn(shape) >= 9:
+            cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
+                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
         print(lip_dist)
         """
         if lip_dist > yawn_thresh:
