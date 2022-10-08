@@ -25,7 +25,7 @@ cam = cv2.VideoCapture(0)
 
 # -------Models---------#
 face_model = dlib.get_frontal_face_detector()
-landmark_model = dlib.shape_predictor('/dat/shape_predictor_68_face_landmarks.dat')
+landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 
 # --------Variables-------#
 yawn_thresh = 35
