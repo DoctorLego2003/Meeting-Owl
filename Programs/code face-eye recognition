@@ -1,7 +1,7 @@
 import cv2
 
-face_cascade = cv2.CascadeClassifier(r'C:\Users\kaspe\Desktop\haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(r'C:\Users\kaspe\Desktop\haarcascade_eye.xml')
+face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
 
 cap = cv2.VideoCapture(0)
 
@@ -14,16 +14,20 @@ while True:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
         rec_color = img[y:y + h, x:x + w]
+        width = (100 - h)//2
+        hight = (100 - w)//2
+        zoomed = img[y + hight:y + h - hight, x + width:x + w - width]
 
-        eyes = eye_cascade.detectMultiScale(rec_gray)
+        #eyes = eye_cascade.detectMultiScale(rec_gray)
 
-        for (a, b, c, d) in eyes:
-            cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
+        #for (a, b, c, d) in eyes:
+        #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
 
     cv2.imshow('Face Recognition', img)
+    cv2.imshow('Zoom in', zoomed)
 
     k = cv2.waitKey(30) & 0xff
-    if k == 27:
+    if k == ord('q'):
         break
 
 cap.release()
