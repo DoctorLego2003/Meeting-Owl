@@ -1,9 +1,10 @@
 import cv2
 
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
+#eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
 
 cap = cv2.VideoCapture(0)
+start = None
 
 while True:
     ret, img = cap.read()
@@ -17,14 +18,15 @@ while True:
         width = (100 - h)//2
         hight = (100 - w)//2
         zoomed = img[y + hight:y + h - hight, x + width:x + w - width]
-
+        start = True
         #eyes = eye_cascade.detectMultiScale(rec_gray)
 
         #for (a, b, c, d) in eyes:
         #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
 
     cv2.imshow('Face Recognition', img)
-    cv2.imshow('Zoom in', zoomed)
+    if start and zoomed.all() is not None:
+        cv2.imshow('Zoom in', zoomed)
 
     k = cv2.waitKey(30) & 0xff
     if k == ord('q'):
