@@ -2,6 +2,7 @@ import cv2
 
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
+profile_casade = cv2.CascadeClassifier(r'./xml')
 
 cap = cv2.VideoCapture(0)
 start = None
