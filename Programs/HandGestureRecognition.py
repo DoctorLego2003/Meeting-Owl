@@ -17,7 +17,7 @@ mpDraw = mp.solutions.drawing_utils
 model = load_model('mp_hand_gesture')
 
 # Load class names
-f = open('gesture.names', 'r')
+f = open('./gestures/gesture.names', 'r')
 classNames = f.read().split('\n')
 f.close()
 print(classNames)
