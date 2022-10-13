@@ -2,7 +2,7 @@ import cv2
 
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
-profile_casade = cv2.CascadeClassifier(r'./xml')
+profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
 cap = cv2.VideoCapture(0)
 start = None
@@ -10,7 +10,23 @@ start = None
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    faces = []
+    front_side = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+
+    if len(front_side) != 0:
+        faces += front_side
+    print(front_side)
+    left_side = profile_cascade.detectMultiScale(gray_img,1.3,5)
+    if len(left_side) != 0:
+        faces += left_side
+    print(left_side)
+    flipped = cv2.flip(gray_img, 1)
+    right_side = face_cascade.detectMultiScale(flipped, 1.3, 5)
+    if len(right_side) != 0:
+        faces += right_side
+    print(right_side)
+    print(faces)
+
     """
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
@@ -24,6 +40,8 @@ while True:
         #for (a, b, c, d) in eyes:
         #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
     """
+
+
     zoomed = []
     for i in range(len(faces)):
         (x, y, w, h) = faces[i]
@@ -45,6 +63,9 @@ while True:
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
+
+
+
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
