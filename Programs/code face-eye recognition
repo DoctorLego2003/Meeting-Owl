@@ -4,11 +4,35 @@ face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml
 #eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
 
 cap = cv2.VideoCapture(0)
-start = None
+faces = None
+previous = None
+
+def distance(point_one, point_two):
+    [x1, y1, w1, h1] = point_one
+    [x2, y2, w2, h2] = point_two
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    return dist
+
+
+def closest(point, new_points):
+    distmat = []
+    for new_point in new_points:
+        distmat.append(distance(point, new_point))
+    index = 0
+    minimum = distmat[0]
+    for i in range(len(distmat)):
+        if minimum > distmat[i]:
+            minimum = distmat[i]
+            index = i
+    return index
+
+
 
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if faces is not None:
+        previous = faces
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     """
     for (x, y, w, h) in faces:
@@ -24,7 +48,14 @@ while True:
         #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
     """
     zoomed = []
+
+
+
     for i in range(len(faces)):
+        if previous is not None:
+            index = closest(faces[i],previous)
+            
+
         (x, y, w, h) = faces[i]
         zoomed.append([])
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
@@ -46,6 +77,7 @@ while True:
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
         cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
+    print(faces)
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
     #    cv2.imshow('Zoom in', zoomed)
