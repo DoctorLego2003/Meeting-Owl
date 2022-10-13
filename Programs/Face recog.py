@@ -5,7 +5,10 @@ import dlib
 import time
 from scipy.spatial import distance as dist
 from imutils import face_utils
+
 distancevorige = 0
+face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
+
 
 def cal_yawn(shape, distancevorige):
     top_lip = shape[50:53]
@@ -28,11 +31,16 @@ cam = cv2.VideoCapture(0)
 # -------Models---------#
 face_model = dlib.get_frontal_face_detector()
 landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
-
+print(face_model)
 # --------Variables-------#
 yawn_thresh = 35
 ptime = 0
 while True:
+
+    ret, img = cam.read()
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gezicht = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+
     suc, frame = cam.read()
 
     if not suc:
@@ -49,6 +57,7 @@ while True:
     img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_model(img_gray)
     for face in faces:
+
         # #------Uncomment the following lines if you also want to detect the face ----------#
         # x1 = face.left()
         # y1 = face.top()
@@ -71,12 +80,16 @@ while True:
         lip_dist = int(lip_dist)
         distancevorige = int(distancevorige)
         verschil = abs(lip_dist-distancevorige)
+        for (x, y, w, h) in gezicht:
+            relatief_verschil = 100*verschil/w
+            print(relatief_verschil)
+            if relatief_verschil >= 1:
+                cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
         #cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
         #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-        if verschil >= 2:
-            cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-        print(verschil)
+
+
         distancevorige = lip_dist
         """
         if lip_dist > yawn_thresh:
