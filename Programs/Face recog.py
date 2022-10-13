@@ -70,7 +70,7 @@ while True:
         lip_dist, distancevorige = (cal_yawn(shape, distancevorige))
         lip_dist = int(lip_dist)
         distancevorige = int(distancevorige)
-        verschil = abs(lip_dist-distancevorige)
+        verschil = abs(lip_dist - distancevorige)
         #cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
         #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
         if verschil >= 2:
