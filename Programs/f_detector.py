@@ -3,13 +3,12 @@ import numpy as np
 import config as cfg
 
 def detect(img, cascade):
-    rects,_,confidence = cascade.detectMultiScale3(img, scaleFactor=1.25, minNeighbors=4, minSize=(30, 30),
-                                    flags=cv2.CASCADE_SCALE_IMAGE, outputRejectLevels = True)
-    #rects = cascade.detectMultiScale(img,minNeighbors=10, scaleFactor=1.05)
+    #rects,_,confidence = cascade.detectMultiScale3(img, scaleFactor=1.25, minNeighbors=4, minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE, outputRejectLevels = True)
+    rects = cascade.detectMultiScale(img, 1.25, 4)
     if len(rects) == 0:
         return (),()
-    rects[:,2:] += rects[:,:2]
     print(rects)
+    confidence = None
     return rects,confidence
 
 
