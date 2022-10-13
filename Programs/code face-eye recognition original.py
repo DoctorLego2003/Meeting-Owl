@@ -1,20 +1,16 @@
 import cv2
-import imutils
-import BoundingBox
-import f_detector
-import time
 
-detector = f_detector.detect_face_orientation()
-
-#face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
-#eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
+face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
+profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
 cap = cv2.VideoCapture(0)
 
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = detector.face_orientation(gray_img)
+    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    if len(faces) == 0:
+        faces = ()
 
 
     """
@@ -47,7 +43,7 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = img[y-h2:y + h + h2, x - w2:x + w + w2]
+        zoomed[i] = img[y-h2:y + h +h2, x -w2:x + w +w2]
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])

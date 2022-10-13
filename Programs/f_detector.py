@@ -7,7 +7,6 @@ def detect(img, cascade):
     rects = cascade.detectMultiScale(img, 1.25, 4)
     if len(rects) == 0:
         return (),()
-    print(rects)
     confidence = None
     return rects,confidence
 
@@ -37,35 +36,24 @@ class detect_face_orientation():
         box_frontal,w_frontal = detect(gray,self.detect_frontal_face)
         if len(box_frontal)==0:
             box_frontal = []
-            name_frontal = []
-        else:
-            name_frontal = len(box_frontal)*["frontal"]
         # left_face
         box_left, w_left = detect(gray,self.detect_perfil_face)
         if len(box_left)==0:
             box_left = []
-            name_left = []
-        else:
-            name_left = len(box_left)*["left"]
         # right_face
         gray_flipped = cv2.flip(gray, 1)
         box_right, w_right = detect(gray_flipped,self.detect_perfil_face)
         if len(box_right)==0:
             box_right = []
-            name_right = []
         else:
             box_right = convert_rightbox(gray,box_right)
-            name_right = len(box_right)*["right"]
 
         if len(box_frontal) != 0:
             box_left = []
-            name_left = []
             box_right = []
-            name_right = []
 
 
 
         boxes = list(box_frontal)+list(box_left)+list(box_right)
-        names = list(name_frontal)+list(name_left)+list(name_right)
-        return boxes, names
+        return boxes
 
