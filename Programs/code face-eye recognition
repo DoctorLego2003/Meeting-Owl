@@ -63,6 +63,7 @@ while True:
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
+        cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
 
 

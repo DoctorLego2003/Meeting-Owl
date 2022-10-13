@@ -5,9 +5,9 @@ import dlib
 import time
 from scipy.spatial import distance as dist
 from imutils import face_utils
+distancevorige = 0
 
-
-def cal_yawn(shape):
+def cal_yawn(shape, distancevorige):
     top_lip = shape[50:53]
     top_lip = np.concatenate((top_lip, shape[61:64]))
 
@@ -18,7 +18,9 @@ def cal_yawn(shape):
     low_mean = np.mean(low_lip, axis=0)
 
     distance = dist.euclidean(top_mean, low_mean)
-    return distance
+    distancenu = distance
+
+    return distancenu, distancevorige
 
 
 cam = cv2.VideoCapture(0)
@@ -64,13 +66,18 @@ while True:
         cv2.drawContours(frame, [lip], -1, (0, 165, 255), thickness=3)
 
         # -------Calculating the lip distance-----#
-        lip_dist = str(cal_yawn(shape))
+
+        lip_dist, distancevorige = (cal_yawn(shape, distancevorige))
+        lip_dist = int(lip_dist)
+        distancevorige = int(distancevorige)
+        verschil = abs(lip_dist - distancevorige)
         #cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
         #            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-        if 25 >= cal_yawn(shape) >= 9:
+        if verschil >= 2:
             cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-        print(lip_dist)
+        print(verschil)
+        distancevorige = lip_dist
         """
         if lip_dist > yawn_thresh:
             cv2.putText(frame, f'User Yawning!', (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
