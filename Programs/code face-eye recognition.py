@@ -3,15 +3,35 @@ import numpy
 prev = []
 zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
-#eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
+profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
+
+def detect_face_orientation(img):
+    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    if len(faces) != 0:
+        return faces
+    else:
+        faces = profile_cascade.detectMultiScale(gray_img, 1.3, 4)
+        if len(faces) != 0:
+            return faces
+    gray_flipped = cv2.flip(gray_img, 1)
+    faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
+    if len(faces) != 0:
+        h, w = img.shape
+        x = faces[0][0]
+        new_x = (w/2) - x -1
+        print(w, x, new_x)
+        faces[0][0] = new_x
+    return faces
 
 cap = cv2.VideoCapture(0)
-start = None
 
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    faces = detect_face_orientation(gray_img)
+
+
 
     #print('faces:', faces, len(faces))
     #print('len(zoomed):', len(zoomed))
@@ -39,6 +59,7 @@ while True:
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), img[y - zoomed[i][0]: y + zoomed[i][1], x - zoomed[i][2]:x + zoomed[i][3]])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
+        cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
     #print('prev:',prev)
     if len(faces) != len(prev) and len(prev) != 0:
