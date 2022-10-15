@@ -1,6 +1,7 @@
 import cv2
 import numpy
-prev = None
+prev = []
+zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
 
@@ -11,6 +12,7 @@ while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+
     """
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
@@ -23,6 +25,7 @@ while True:
 
         #for (a, b, c, d) in eyes:
         #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
+        
     print('faces:', faces)
     if prev is not None:
         for i in range(0, len(faces)):
@@ -38,10 +41,14 @@ while True:
     else:
         prev = faces
     """
-    zoomed = []
+
+    print('faces:', faces, len(faces))
+    print('len(zoomed):', len(zoomed))
     for i in range(len(faces)):
+        print('faces[i]:', faces[i])
+        if len(faces) > len(zoomed):
+            zoomed.append([])
         (x, y, w, h) = faces[i]
-        zoomed.append([])
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
         rec_color = img[y:y + h, x:x + w]
@@ -55,7 +62,16 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = img[y-h2:y + h +h2, x -w2:x + w +w2]
+        zoomed[i] = img[y-h2:y + h + h2, x - w2:x + w + w2]
+        print('zoomed[i]:', zoomed[i])
+        """
+        if len(zoomed) > len(faces):
+            verschil = len(zoomed) - len(faces)
+            zoomed = zoomed[:-verschil]
+            for j in range(len(faces), len(zoomed)):
+                print(len(faces)+j+1)
+                cv2.destroyWindow('Zoom in ' + str(len(faces)+j+1))
+        """
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
@@ -70,13 +86,13 @@ while True:
         """
 
     #print('prev:',prev)
-    if len(zoomed) > len(faces):
-        verschil = len(zoomed) - len(faces)
-        zoomed = zoomed[:-verschil]
+    if len(faces) != len(prev) and len(prev) != 0:
+        cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
     #    cv2.imshow('Zoom in', zoomed)
+    prev = faces
 
     k = cv2.waitKey(30) & 0xff
     if k == ord('q'):
