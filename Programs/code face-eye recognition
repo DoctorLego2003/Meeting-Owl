@@ -13,37 +13,8 @@ while True:
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
 
-    """
-    for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-        rec_gray = gray_img[y:y + h, x:x + w]
-        rec_color = img[y:y + h, x:x + w]
-
-        zoomed = img[y:y + h, x:x + w]
-        start = True
-        #eyes = eye_cascade.detectMultiScale(rec_gray)
-
-        #for (a, b, c, d) in eyes:
-        #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
-        
-    print('faces:', faces)
-    if prev is not None:
-        for i in range(0, len(faces)):
-            q = prev[i] == faces[i]
-            print('q:', q)
-            if not all(q):
-                prev[i] = faces[i]
-            elif i > len(prev):
-                prev.append(faces[i])
-            else:
-                numpy.delete(prev, i)
-                print('prev:', prev)
-    else:
-        prev = faces
-    """
-
-    print('faces:', faces, len(faces))
-    print('len(zoomed):', len(zoomed))
+    #print('faces:', faces, len(faces))
+    #print('len(zoomed):', len(zoomed))
     for i in range(len(faces)):
         print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
@@ -63,27 +34,11 @@ while True:
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
         zoomed[i] = [h2, h + h2, w2, w + w2]
-        """
-        if len(zoomed) > len(faces):
-            verschil = len(zoomed) - len(faces)
-            zoomed = zoomed[:-verschil]
-            for j in range(len(faces), len(zoomed)):
-                print(len(faces)+j+1)
-                cv2.destroyWindow('Zoom in ' + str(len(faces)+j+1))
-        """
+
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), img[y - zoomed[i][0]: y + zoomed[i][1], x - zoomed[i][2]:x + zoomed[i][3]])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
-        cv2.waitKey(30)
-        """
-        if 'hoofd'+str(i+1) in prev:
-            print(prev['hoofd'+str(i+1)])
-            if prev['hoofd'+str(i+1)] == [x,y]:
-                print('hoofd' + str(i+1))
-                faces.pop('hoofd' + str(i+1),None)
-        prev['hoofd'+str(i+1)] = [x, y]
-        """
 
     #print('prev:',prev)
     if len(faces) != len(prev) and len(prev) != 0:
