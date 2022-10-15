@@ -20,7 +20,7 @@ while True:
     cv2.imshow('Face Recognition', img)
 
     k = cv2.waitKey(30) & 0xff
-    if k == 27:
+    if k == 27 or k == ord('q'):
         break
 
 cap.release()

@@ -1,5 +1,6 @@
 import cv2
-listheads = {}
+import numpy
+prev = None
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_eye.xml')
 
@@ -22,6 +23,20 @@ while True:
 
         #for (a, b, c, d) in eyes:
         #    cv2.rectangle(rec_color, (a, b), (a+c, b+d), (0, 127, 255), 2)
+    print('faces:', faces)
+    if prev is not None:
+        for i in range(0, len(faces)):
+            q = prev[i] == faces[i]
+            print('q:', q)
+            if not all(q):
+                prev[i] = faces[i]
+            elif i > len(prev):
+                prev.append(faces[i])
+            else:
+                numpy.delete(prev, i)
+                print('prev:', prev)
+    else:
+        prev = faces
     """
     zoomed = []
     for i in range(len(faces)):
@@ -45,15 +60,19 @@ while True:
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
-        if 'hoofd'+str(i+1) in listheads:
-            print(listheads['hoofd'+str(i+1)])
-            if listheads['hoofd'+str(i+1)] == (x, y):
+        """
+        if 'hoofd'+str(i+1) in prev:
+            print(prev['hoofd'+str(i+1)])
+            if prev['hoofd'+str(i+1)] == [x,y]:
                 print('hoofd' + str(i+1))
-                listheads.pop('hoofd' + str(i+1))
-        listheads['hoofd'+str(i+1)] = [x, y]
+                faces.pop('hoofd' + str(i+1),None)
+        prev['hoofd'+str(i+1)] = [x, y]
+        """
 
-
-        print(listheads)
+    #print('prev:',prev)
+    if len(zoomed) > len(faces):
+        verschil = len(zoomed) - len(faces)
+        zoomed = zoomed[:-verschil]
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
