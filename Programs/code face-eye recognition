@@ -62,8 +62,7 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = img[y-h2:y + h + h2, x - w2:x + w + w2]
-        print('zoomed[i]:', zoomed[i])
+        zoomed[i] = [h2, h + h2, w2, w + w2]
         """
         if len(zoomed) > len(faces):
             verschil = len(zoomed) - len(faces)
@@ -74,8 +73,9 @@ while True:
         """
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
+        cv2.imshow('Zoom in ' + str(i + 1), img[y - zoomed[i][0]: y + zoomed[i][1], x - zoomed[i][2]:x + zoomed[i][3]])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
+        cv2.waitKey(30)
         """
         if 'hoofd'+str(i+1) in prev:
             print(prev['hoofd'+str(i+1)])
@@ -88,6 +88,7 @@ while True:
     #print('prev:',prev)
     if len(faces) != len(prev) and len(prev) != 0:
         cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
+        zoomed.remove(zoomed[-1])
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
