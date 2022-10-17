@@ -8,8 +8,6 @@ profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 def intersection(a,b):
   x = max(a[0], b[0])
   y = max(a[1], b[1])
-  wdt = max(a[2], b[2])
-  ht = max(a[3], b[3])
   w = min(a[0]+a[2], b[0]+b[2]) - x
   h = min(a[1]+a[3], b[1]+b[3]) - y
   if w<0 or h<0: return False
