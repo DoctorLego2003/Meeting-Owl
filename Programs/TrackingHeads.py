@@ -8,12 +8,13 @@ def distance(point_one, point_two):
     [x1, y1, w1, h1] = point_one
     [x2, y2, w2, h2] = point_two
     dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    print(dist)
     return dist
 
 
 def closest(point, new_points):
-    if len(new_points) ==0:
-        return
+    if len(new_points) == 0:
+        return -1
     distmat = []
     for new_point in new_points:
         distmat.append(distance(point, new_point))
@@ -51,21 +52,21 @@ while True:
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
 
-
+    new_list = []
     for zoom in zoomed:
         index = closest(zoom[1], faces)
-        if index == None:
-            break
-        a = faces[zoomed.index(zoom)]
-        faces[zoomed.index(zoom)] = faces[index]
-        faces[index] = a
+        if index != -1:
+            new_list.append(faces[index])
+    if new_list != []:
+        faces = new_list
 
 
+    print('new_list:', new_list)
 
     print('faces:', faces, len(faces))
     print('zoomed:', zoomed)
     for i in range(len(faces)):
-        print('faces[i]:', faces[i])
+        #print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
             zoomed.append([[],[],])
         (x, y, w, h) = faces[i]
