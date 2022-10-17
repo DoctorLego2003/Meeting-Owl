@@ -8,9 +8,11 @@ profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 def intersection(a,b):
   x = max(a[0], b[0])
   y = max(a[1], b[1])
+  wdt = max(a[2], b[2])
+  ht = max(a[3], b[3])
   w = min(a[0]+a[2], b[0]+b[2]) - x
   h = min(a[1]+a[3], b[1]+b[3]) - y
-  if w<0 or h<0: return False # or (0,0,0,0) ?
+  if w<0 or h<0: return False
   return True
 
 def detect_face_orientation(img):
@@ -27,9 +29,12 @@ def detect_face_orientation(img):
             if len(faces) == 0:
                 faces.append(face)
             else:
+                check = True
                 for second_face in faces:
-                    if not intersection(face, second_face):
-                        faces.append(face)
+                    if intersection(face, second_face):
+                        check = False
+                if check:
+                    faces.append(face)
     if len(right_profile) != 0:
         for face in right_profile:
             w, h = img.shape
@@ -39,9 +44,12 @@ def detect_face_orientation(img):
             if len(faces) == 0:
                 faces.append(face)
             else:
+                check = True
                 for second_face in faces:
-                    if not intersection(face,second_face):
-                        faces.append(face)
+                    if intersection(face,second_face):
+                        check = False
+                if check:
+                    faces.append(face)
     return faces
 
 cap = cv2.VideoCapture(0)
