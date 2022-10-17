@@ -4,14 +4,21 @@ zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
+h2 = 75
+w2 = 75
+
 def distance(point_one, point_two):
-    [x1, y1, w1, h1] = point_one
-    [x2, y2, w2, h2] = point_two
+    if point_one == []:
+        return float('inf')
+    [y1, h0, x1, h0] = point_one
+    [x2, y2, w1, h1] = point_two
+    x1 = x1 + w2
+    y1 = y1 + h2
     dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
-    print(dist)
+    #print(dist)
     return dist
 
-
+'''
 def closest(point, new_points):
     if len(new_points) == 0:
         return -1
@@ -25,7 +32,7 @@ def closest(point, new_points):
             minimum = distmat[i]
             index = i
     return index
-
+'''
 def detect_face_orientation(img):
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     if len(faces) != 0:
@@ -40,9 +47,44 @@ def detect_face_orientation(img):
         h, w = img.shape
         x = faces[0][0]
         new_x = h - x -1
-        print(w, x, new_x)
+        #print(w, x, new_x)
         faces[0][0] = new_x
     return faces
+
+def sort_close(zoomed, faces):
+    dist = []
+    for i in range(len(zoomed)):
+        dist.append([])
+        for punt in faces:
+            dist[i].append(distance(zoomed[i][1], punt))
+    print('dist:', dist)
+    min_ind = []
+    for i in range(len(dist)):
+        min_ind.append([])
+        if len(dist[i]) != 0:
+            mini = min(dist[i])
+            if mini <= 300:
+                counter = 0
+                for thing in dist[i]:
+                    if thing == mini:
+                        counter += 1
+                if counter > 1:
+                    for j in range(counter):
+                        index_new = dist[i].index(mini)
+                        min_ind[i].append(index_new)
+                        dist[i][index_new] = -1
+                else:
+                    min_ind[i].append(dist[i].index(mini))
+    #print(min_ind)
+    i = 0
+    while i < len(min_ind):
+        if len(min_ind[i]) > 1:
+            for point in min_ind[i]:
+                if [point] in min_ind:
+                    min_ind[i].remove(point)
+        i += 1
+    print(min_ind)
+    return min_ind
 
 cap = cv2.VideoCapture(0)
 
@@ -52,29 +94,39 @@ while True:
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
 
-    new_list = []
-    for zoom in zoomed:
-        index = closest(zoom[1], faces)
-        if index != -1:
-            new_list.append(faces[index])
-    if new_list != []:
-        faces = new_list
-
-
-    print('new_list:', new_list)
-
-    print('faces:', faces, len(faces))
-    print('zoomed:', zoomed)
-    for i in range(len(faces)):
-        #print('faces[i]:', faces[i])
+    print('faces before:',faces)
+    print('zoomed:',zoomed)
+    min_ind = sort_close(zoomed, faces)
+    #print('min_ind:', min_ind)
+    missing_face = False
+    new_faces = faces
+    for i in range(len(min_ind)):
+        index = min_ind[i]
+        #print('index:', index)
+        if len(index) != 0:
+            new_faces[i] = faces[index[0]]
+        elif len(index) == 0:
+            missing_face = True
+    if missing_face:
         if len(faces) > len(zoomed):
-            zoomed.append([[],[],])
+            missing_index = [x for x in range(0,len(faces)) if x not in min_ind]
+            print('missing_index:', missing_index)
+            face = faces[missing_index]
+            zoomed.append([face, [], ])
+    if len(new_faces) != 0:
+        faces = new_faces
+
+    print('faces after:', faces)
+    #print('zoomed:', zoomed)
+    for i in range(len(faces)):
+        if len(faces) > len(zoomed):
+            zoomed.append([[], [], ])
+        #print('faces[i]:', faces[i])
         (x, y, w, h) = faces[i]
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
         rec_color = img[y:y + h, x:x + w]
-        h2 = 75
-        w2 = 75
+        #h2 en w2 staan boven als vaste variabelen
         if y < h2:
             h2 = y
         if x + w2 + w > len(gray_img[0]):
