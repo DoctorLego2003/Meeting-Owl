@@ -1,9 +1,29 @@
 import cv2
 import numpy
-prev = []
 zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
+
+def distance(point_one, point_two):
+    [x1, y1, w1, h1] = point_one
+    [x2, y2, w2, h2] = point_two
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    return dist
+
+
+def closest(point, new_points):
+    if len(new_points) ==0:
+        return
+    distmat = []
+    for new_point in new_points:
+        distmat.append(distance(point, new_point))
+    index = 0
+    minimum = distmat[0]
+    for i in range(len(distmat)):
+        if minimum > distmat[i]:
+            minimum = distmat[i]
+            index = i
+    return index
 
 def detect_face_orientation(img):
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
@@ -30,6 +50,15 @@ while True:
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
+
+
+    for zoom in zoomed:
+        index = closest(zoom[1], faces)
+        if index == None:
+            break
+        a = faces[zoomed.index(zoom)]
+        faces[zoomed.index(zoom)] = faces[index]
+        faces[index] = a
 
 
 
