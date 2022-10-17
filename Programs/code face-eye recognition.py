@@ -5,6 +5,25 @@ zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
+def distance(point_one, point_two):
+    [x1, y1, w1, h1] = point_one
+    [x2, y2, w2, h2] = point_two
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    return dist
+
+
+def closest(point, new_points):
+    distmat = []
+    for new_point in new_points:
+        distmat.append(distance(point, new_point))
+    index = 0
+    minimum = distmat[0]
+    for i in range(len(distmat)):
+        if minimum > distmat[i]:
+            minimum = distmat[i]
+            index = i
+    return index
+
 def detect_face_orientation(img):
     faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     if len(faces) != 0:
