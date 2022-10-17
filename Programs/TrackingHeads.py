@@ -38,7 +38,7 @@ while True:
     for i in range(len(faces)):
         print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
-            zoomed.append([])
+            zoomed.append([[],[],])
         (x, y, w, h) = faces[i]
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
@@ -53,23 +53,36 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = [y - h2, y + h + h2, x - w2, x + w + w2]
+        zoomed[i][0] = [y - h2, y + h + h2, x - w2, x + w + w2]
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        cv2.imshow('Zoom in ' + str(i + 1), img[zoomed[i][0]: zoomed[i][1], zoomed[i][2]: zoomed[i][3]])
+        cv2.imshow('Zoom in ' + str(i + 1), img[zoomed[i][0][0]: zoomed[i][0][1], zoomed[i][0][2]: zoomed[i][0][3]])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
         cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
+
     #print('prev:',prev)
+    removed = []
+    for i in range(len(zoomed)):
+        if zoomed[i][0] == zoomed[i][1]:
+            cv2.destroyWindow('Zoom in ' + str(i+1))
+            removed.append(zoomed[i])
+        else:
+            zoomed[i][1] = zoomed[i][0]
+    for x in removed:
+        zoomed.remove(x)
+
+    '''
     if len(faces) != len(prev) and len(prev) != 0:
         cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
         zoomed.remove(zoomed[-1])
+    '''
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
     #    cv2.imshow('Zoom in', zoomed)
-    prev = faces
+
 
     k = cv2.waitKey(30) & 0xff
     if k == ord('q'):
