@@ -4,21 +4,25 @@ face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
 def detect_face_orientation(img):
-    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    if len(faces) != 0:
-        return faces
-    else:
-        faces = profile_cascade.detectMultiScale(gray_img, 1.3, 4)
-        if len(faces) != 0:
-            return faces
+    faces = []
+    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
     gray_flipped = cv2.flip(gray_img, 1)
-    faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
-    if len(faces) != 0:
-        h, w = img.shape
-        x = faces[0][0]
-        new_x = (w/2) - x -1
-        print(w, x, new_x)
-        faces[0][0] = new_x
+    right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
+    if len(front_faces) != 0:
+        for face in front_faces:
+            faces.append(face)
+    if len(left_profile) != 0:
+        for face in left_profile:
+            faces.append(face)
+
+    if len(right_profile) != 0:
+        for face in right_profile:
+            h, w = img.shape
+            x = face[0]
+            new_x = (w/2) - x - 1
+            face[0] = new_x
+            faces.append(face)
     return faces
 
 cap = cv2.VideoCapture(0)
