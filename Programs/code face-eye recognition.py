@@ -17,12 +17,11 @@ def detect_face_orientation(img):
     if len(left_profile) != 0:
         for face in left_profile:
             faces.append(face)
-
     if len(right_profile) != 0:
         for face in right_profile:
-            h, w = img.shape
+            w, h = img.shape
             x = face[0]
-            new_x = h - x - 1
+            new_x = w - x - 1
             face[0] = new_x
             faces.append(face)
     return faces
