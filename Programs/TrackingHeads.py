@@ -98,26 +98,45 @@ while True:
     print('zoomed:',zoomed)
     min_ind = sort_close(zoomed, faces)
     #print('min_ind:', min_ind)
+
+    #Trying to do Face Tracking
     missing_face = False
-    new_faces = faces
+    new_faces = []
     for i in range(len(min_ind)):
         index = min_ind[i]
         #print('index:', index)
-        if len(index) != 0:
-            new_faces[i] = faces[index[0]]
-        elif len(index) == 0:
+        if index == []:
+            #print('iets')
             missing_face = True
+        else:
+            new_faces.append(faces[index[0]])
     if missing_face:
         if len(faces) > len(zoomed):
-            missing_index = [x for x in range(0,len(faces)) if x not in min_ind]
-            print('missing_index:', missing_index)
+            all_index = [x for x in range(len(faces))]
+            missing_index = list(filter(lambda x:x not in min_ind, all_index))
+            #print('missing_index:', missing_index)
             face = faces[missing_index]
-            zoomed.append([face, [], ])
+            new_faces.append(face)
+            #print('new:', new_faces)
+            missing_face = False
     if len(new_faces) != 0:
-        faces = new_faces
+        if len(new_faces) > 1:
+            #print(new_faces)
+            faces = numpy.asarray(new_faces)
+            #print(faces)
+        else:
+            faces = numpy.asarray(new_faces)
 
-    print('faces after:', faces)
+    if len(faces) > 0:
+        print(len(faces[0]))
+        if len(faces) == 1 and len(faces[0]) != 4:
+            faces = faces[0]
+            print(faces)
+
+    #print('faces after:', faces)
     #print('zoomed:', zoomed)
+
+    #Zooming in on the face
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
             zoomed.append([[], [], ])
