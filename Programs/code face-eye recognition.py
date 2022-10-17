@@ -33,8 +33,8 @@ while True:
 
 
 
-    #print('faces:', faces, len(faces))
-    #print('len(zoomed):', len(zoomed))
+    print('faces:', faces, len(faces))
+    print('zoomed:', zoomed)
     for i in range(len(faces)):
         print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
@@ -53,11 +53,11 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = [h2, h + h2, w2, w + w2]
+        zoomed[i] = [y - h2, y + h + h2, x - w2, x + w + w2]
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        cv2.imshow('Zoom in ' + str(i + 1), img[y - zoomed[i][0]: y + zoomed[i][1], x - zoomed[i][2]:x + zoomed[i][3]])
+        cv2.imshow('Zoom in ' + str(i + 1), img[zoomed[i][0]: zoomed[i][1], zoomed[i][2]: zoomed[i][3]])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
         cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
