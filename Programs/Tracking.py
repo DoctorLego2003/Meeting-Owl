@@ -27,7 +27,7 @@ def track(faces, zoomed):
         min_ind.append([])
         if len(dist[i]) != 0:
             mini = min(dist[i])
-            if mini <= 300:
+            if mini <= 100:
                 counter = 0
                 for thing in dist[i]:
                     if thing == mini:
@@ -90,6 +90,7 @@ def detect_face_orientation(img):
 
 cap = cv2.VideoCapture(0)
 
+
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -105,7 +106,7 @@ while True:
     for i in range(len(faces)):
         #print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
-            zoomed.append([[],[]])
+            zoomed.append([[], []])
         (x, y, w, h) = faces[i]
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
@@ -126,13 +127,12 @@ while True:
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), img[y - h2: y + h2 + h, x - w2: x + w2 + w])
-        cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
         cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
-    #print('prev:',prev)
-    if len(faces) != len(prev) and len(prev) != 0:
-        cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
-        zoomed.remove(zoomed[-1])
+        #print('prev:',prev)
+        if len(faces) != len(prev) and len(prev) != 0:
+            cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
+            zoomed.remove(zoomed[-1])
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
