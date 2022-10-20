@@ -4,9 +4,6 @@ zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
-h2 = 75
-w2 = 75
-
 def distance(point_one, point_two):
     if point_one == []:
         return float('inf')
@@ -89,13 +86,14 @@ def sort_close(zoomed, faces):
 cap = cv2.VideoCapture(0)
 
 while True:
+
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
 
     print('faces before:',faces)
-    print('zoomed:',zoomed)
+    #print('zoomed:',zoomed)
     min_ind = sort_close(zoomed, faces)
     #print('min_ind:', min_ind)
 
@@ -110,11 +108,12 @@ while True:
             missing_face = True
         else:
             new_faces.append(faces[index[0]])
+
     if missing_face:
-        if len(faces) > len(zoomed):
+        if len(faces) >= len(zoomed):
             all_index = [x for x in range(len(faces))]
             missing_index = list(filter(lambda x:x not in min_ind, all_index))
-            #print('missing_index:', missing_index)
+            print('missing_index:', missing_index)
             face = faces[missing_index]
             new_faces.append(face)
             #print('new:', new_faces)
@@ -128,10 +127,10 @@ while True:
             faces = numpy.asarray(new_faces)
 
     if len(faces) > 0:
-        print(len(faces[0]))
+        #print(len(faces[0]))
         if len(faces) == 1 and len(faces[0]) != 4:
             faces = faces[0]
-            print(faces)
+            #print(faces)
 
     #print('faces after:', faces)
     #print('zoomed:', zoomed)
@@ -142,10 +141,12 @@ while True:
             zoomed.append([[], [], ])
         #print('faces[i]:', faces[i])
         (x, y, w, h) = faces[i]
+        print('faces[',i,']', faces)
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
         rec_color = img[y:y + h, x:x + w]
-        #h2 en w2 staan boven als vaste variabelen
+        h2 = 75
+        w2 = 75
         if y < h2:
             h2 = y
         if x + w2 + w > len(gray_img[0]):
@@ -155,14 +156,14 @@ while True:
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
         zoomed[i][0] = [y - h2, y + h + h2, x - w2, x + w + w2]
+        #print('zoomed[i] new:', zoomed[i][0])
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), img[zoomed[i][0][0]: zoomed[i][0][1], zoomed[i][0][2]: zoomed[i][0][3]])
-        cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
         cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
-
+    print('zoomed:', zoomed)
     #print('prev:',prev)
     removed = []
     for i in range(len(zoomed)):
