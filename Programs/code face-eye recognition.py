@@ -5,15 +5,20 @@ zoomed = []
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
+def intersection(a,b):
+  x = max(a[0], b[0])
+  y = max(a[1], b[1])
+  w = min(a[0]+a[2], b[0]+b[2]) - x
+  h = min(a[1]+a[3], b[1]+b[3]) - y
+  if w<0 or h<0: return False
+  return True
+
 def detect_face_orientation(img):
-    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    if len(faces) != 0:
-        return faces
-    else:
-        faces = profile_cascade.detectMultiScale(gray_img, 1.3, 4)
-        if len(faces) != 0:
-            return faces
+    faces = []
+    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
     gray_flipped = cv2.flip(gray_img, 1)
+"""
     faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
     if len(faces) != 0:
         h, w = img.shape
@@ -21,6 +26,37 @@ def detect_face_orientation(img):
         new_x = h - x -1
         print(w, x, new_x)
         faces[0][0] = new_x
+"""
+    right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
+    if len(front_faces) != 0:
+        for face in front_faces:
+            faces.append(face)
+    if len(left_profile) != 0:
+        for face in left_profile:
+            if len(faces) == 0:
+                faces.append(face)
+            else:
+                check = True
+                for second_face in faces:
+                    if intersection(face, second_face):
+                        check = False
+                if check:
+                    faces.append(face)
+    if len(right_profile) != 0:
+        for face in right_profile:
+            w, h = img.shape
+            x = face[0]
+            new_x = w - x - 1
+            face[0] = new_x
+            if len(faces) == 0:
+                faces.append(face)
+            else:
+                check = True
+                for second_face in faces:
+                    if intersection(face,second_face):
+                        check = False
+                if check:
+                    faces.append(face)
     return faces
 
 cap = cv2.VideoCapture(0)
@@ -33,10 +69,8 @@ while True:
 
 
 
-    print('faces:', faces, len(faces))
-    print('zoomed:', zoomed)
+
     for i in range(len(faces)):
-        print('faces[i]:', faces[i])
         if len(faces) > len(zoomed):
             zoomed.append([])
         (x, y, w, h) = faces[i]
