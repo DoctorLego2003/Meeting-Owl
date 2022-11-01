@@ -28,6 +28,17 @@ def detect_face_orientation(img):
         faces[0][0] = new_x
     """
     right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
+
+    if type(front_faces) is not tuple:
+        front_faces = front_faces.tolist()
+        #print(front_faces)
+    if type(left_profile) is not tuple:
+        left_profile = left_profile.tolist()
+        #print(left_profile)
+    if type(right_profile) is not tuple:
+        right_profile = right_profile.tolist()
+        #print(right_profile)
+
     if len(front_faces) != 0:
         for face in front_faces:
             faces.append(face)
@@ -59,6 +70,72 @@ def detect_face_orientation(img):
                     faces.append(face)
     return faces
 
+def distance(point_one, point_two):
+    #print((point_one, point_two))
+    if point_one == []:
+        return float('inf')
+    [x1, y1, w0, h0] = point_one
+    [x2, y2, w1, h1] = point_two
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    #print(dist)
+    return dist
+
+def track(faces, zoomed):
+    if len(zoomed) == 0:
+        return faces
+    print('zoomed: ', zoomed)
+    dist = []
+    for i in range(len(zoomed)):
+        dist.append([])
+        for punt in faces:
+            dist[i].append(distance(zoomed[i][0], punt))
+    #print('dist:', dist)
+    #calculating lowest distance per point
+    min_ind = []
+    for i in range(len(dist)):
+        min_ind.append([])
+        if len(dist[i]) != 0:
+            mini = min(dist[i])
+            if mini <= 100:
+                counter = 0
+                for thing in dist[i]:
+                    if thing == mini:
+                        counter += 1
+                if counter > 1:
+                    for j in range(counter):
+                        index_new = dist[i].index(mini)
+                        min_ind[i].append(index_new)
+                        dist[i][index_new] = -1
+                else:
+                    min_ind[i].append(dist[i].index(mini))
+    print('min_ind:', min_ind)
+    i = 0
+    while i < len(min_ind):
+        if len(min_ind[i]) > 1:
+            for point in min_ind[i]:
+                if [point] in min_ind:
+                    min_ind[i].remove(point)
+
+        i += 1
+    #returning a reorganised faces
+    new_faces = []
+    for i in range(len(min_ind)):
+        index = min_ind[i]
+        #print('index:', index)
+        if index != []:
+            new_faces.append(faces[index[0]])
+
+    if len(new_faces) < len(faces):
+        all_index = [x for x in range(len(faces))]
+        missing_index = list(filter(lambda x:[x] not in min_ind, all_index))
+        print('missing_index:', missing_index)
+        for missing in missing_index:
+            new_faces.append(faces[missing])
+        print('new:', new_faces)
+    print('faces: ', faces)
+    print('new_faces: ', new_faces)
+    return new_faces
+
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -66,13 +143,12 @@ while True:
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
-
-
-
+    print('faces:', faces, len(faces))
+    faces = track(faces, zoomed)
 
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
-            zoomed.append([])
+            zoomed.append([[], []])
         (x, y, w, h) = faces[i]
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
@@ -89,24 +165,28 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i] = [y - h2, y + h + h2, x - w2, x + w + w2]
+        zoomed[i][0] = faces[i]
+        #print(zoomed)
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        head_frame = cv2.resize(img[zoomed[i][0]: zoomed[i][1], zoomed[i][2]: zoomed[i][3]], (400, 400))
+        head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
         cv2.imshow('Zoom in ' + str(i + 1), head_frame)
         #cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
         #cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
 
-    #print('prev:',prev)
-    if len(faces) != len(prev) and len(prev) != 0:
-        cv2.destroyWindow('Zoom in ' + str(len(zoomed)))
-        zoomed.remove(zoomed[-1])
-
-    cv2.imshow('Face Recognition', img)
-    #if start and zoomed.all() is not None:
-    #    cv2.imshow('Zoom in', zoomed)
-    prev = faces
+    cv2.imshow('Live: ', img)
+    removed = []
+    for i in range(len(zoomed)):
+        # print(zoomed[i][0])
+        # print(zoomed[i][1])
+        if zoomed[i][0] == zoomed[i][1]:
+            cv2.destroyWindow('Zoom in ' + str(i + 1))
+            removed.append(zoomed[i])
+        else:
+            zoomed[i][1] = zoomed[i][0]
+    for x in removed:
+        zoomed.remove(x)
 
     k = cv2.waitKey(30) & 0xff
     if k == ord('q'):
