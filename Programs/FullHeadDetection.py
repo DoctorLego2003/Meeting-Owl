@@ -18,7 +18,7 @@ def detect_face_orientation(img):
     front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
     gray_flipped = cv2.flip(gray_img, 1)
-"""
+    """
     faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
     if len(faces) != 0:
         h, w = img.shape
@@ -26,7 +26,7 @@ def detect_face_orientation(img):
         new_x = h - x -1
         print(w, x, new_x)
         faces[0][0] = new_x
-"""
+    """
     right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
     if len(front_faces) != 0:
         for face in front_faces:
