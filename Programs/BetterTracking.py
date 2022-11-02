@@ -136,7 +136,12 @@ def track(faces, zoomed):
     print('new_faces: ', new_faces)
     return new_faces
 
-cap = cv2.VideoCapture(0)
+try:
+    cap = cv2.VideoCapture(1)
+    ret, img = cap.read()
+    assert len(img) > 0
+except:
+    cap = cv2.VideoCapture(0)
 
 while True:
     ret, img = cap.read()
