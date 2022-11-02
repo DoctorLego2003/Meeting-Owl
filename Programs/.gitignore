@@ -1,9 +1,5 @@
-images/
-.idea/
-dat/
 
-# voorbeeld van hoe je shit moet oplijsten
-#.env
-#src/json/
-#src/library/
-#src/projects/
+images/
+dat/
+/.idea/
+../.idea/
