@@ -2,6 +2,7 @@ import cv2
 import numpy
 prev = []
 zoomed = []
+treshhold = 30
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
@@ -172,7 +173,7 @@ while True:
             h2 = len(gray_img) - y - h
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
             zoomed[i][0] = faces[i]
-            if zoomed[i][1] < 10:
+            if zoomed[i][1] < treshhold:
                 zoomed[i][1] += 1
         else:
             if zoomed[i][1] >= 0:
@@ -181,7 +182,7 @@ while True:
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        if (zoomed[i][1] >= 5) and (zoomed[i][1] <= 10):
+        if (zoomed[i][1] >= treshhold//2) and (zoomed[i][1] <= treshhold):
             head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
             cv2.imshow('Zoom in ' + str(i + 1), head_frame)
         if zoomed[i][1] == 0:
@@ -190,26 +191,31 @@ while True:
         #cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
         #cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
     for i in range(len(faces), len(zoomed)):
+        if i >= len(zoomed):
+            break
         print('i:', i)
         if zoomed[i][1] > 0:
-            [x, y, w, h] = zoomed[i][0]
-            htot = 3 * h // 2
-            wtot = 3 * w // 2
-            h2 = (htot - h) // 2
-            w2 = (wtot - w) // 2
-            if y < h2:
-                h2 = y
-            if x + w2 + w > len(gray_img[0]):
-                w2 = len(gray_img[0]) - w - x
-            if x < w2:
-                w2 = x
-            if y + h + h2 > len(gray_img):
-                h2 = len(gray_img) - y - h
-            head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
-            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
             zoomed[i][1] -= 1
+            if zoomed[i][1] != 0:
+                [x, y, w, h] = zoomed[i][0]
+                htot = 3 * h // 2
+                wtot = 3 * w // 2
+                h2 = (htot - h) // 2
+                w2 = (wtot - w) // 2
+                if y < h2:
+                    h2 = y
+                if x + w2 + w > len(gray_img[0]):
+                    w2 = len(gray_img[0]) - w - x
+                if x < w2:
+                    w2 = x
+                if y + h + h2 > len(gray_img):
+                    h2 = len(gray_img) - y - h
+                head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+        print('zoomed:', zoomed)
         if zoomed[i][1] == 0:
-            cv2.destroyWindow('Zoom in ' + str(i + 1))
+            if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE ) > 0:
+                cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
 
     cv2.imshow('Live: ', img)
