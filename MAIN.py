@@ -1,12 +1,23 @@
 import cv2
 import time
 import copy
-import numpy
+import dlib
+
+
 prev = []
 zoomed = []
 YAML_DATA = {}
+
+
+# xml files
 face_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xml')
+
+
+# face shit voor lip detection
+face_model = dlib.get_frontal_face_detector()
+landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_landmarks.dat')
+
 
 # open YAML config file
 import yaml
@@ -15,6 +26,7 @@ with open("MAIN_CONFIG", "r") as stream:
         # print(yaml.safe_load(stream))
         yamldata = yaml.safe_load(stream)
         YAML_DATA = copy.deepcopy(yamldata)
+        yawn_thresh = YAML_DATA['yawn_threshold']
     except yaml.YAMLError as exc:
         print(exc)
 
@@ -22,17 +34,23 @@ print(YAML_DATA)
 
 
 
-
-
 # met deze file ander files callen zodat het wat overzichtelijker blijft
 
-# face detection
+# ------face detection------#
 from Programs.BetterTracking import *
+# ------face detection------#
 
 
-# lip detection
+# ------lip detection------#
+distancevorige = 0
+from Programs.LipDetection import *
+# ------lip detection------#
 
-# face recognition
+
+# ------face recognition------#
+
+# ------face recognition------#
+
 
 # ---------FPS------------#
 ptime = 0
@@ -47,6 +65,7 @@ def display_FPS(ptime):
 # ---------FPS------------#
 
 
+# -----MAIN------#
 
 try:
     cap = cv2.VideoCapture(1)
@@ -59,9 +78,10 @@ while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
-    print('faces:', faces, len(faces))
-    faces = track(faces, zoomed)
+    # faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
+    # print('faces:', faces, len(faces))
+    # faces = track(faces, zoomed)
+
 
 
     # ---------FPS------------#
@@ -70,61 +90,19 @@ while True:
         ptime = ptime_new
     # ---------FPS------------#
 
+    # ------Tracking------#
+    main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade)
+    # ------Tracking------#
 
-    for i in range(len(faces)):
-        if len(faces) > len(zoomed):
-            zoomed.append([[], []])
-        (x, y, w, h) = faces[i]
 
-        # -----SHOW RECTANGLE-----#
-        if YAML_DATA['display_face_detection'] == True:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-        # -----SHOW RECTANGLE-----#
+    # ------LipDetection------#
+    if YAML_DATA['display_lip_detection'] == True:
+        main_lip_detection(img, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+    # ------LipDetection------#
 
-        # ------SHOW ZOOMED------#
-        if YAML_DATA['display_face_detection_zoomed'] == True:
-            rec_gray = gray_img[y:y + h, x:x + w]
-            rec_color = img[y:y + h, x:x + w]
-            htot = 3 * h//2
-            wtot = 3 * w//2
-            h2 = (htot - h)//2
-            w2 = (wtot - w)//2
-            if y < h2:
-                h2 = y
-            if x + w2 + w > len(gray_img[0]):
-                w2 = len(gray_img[0]) - w - x
-            if x < w2:
-                w2 = x
-            if y + h + h2 > len(gray_img):
-                h2 = len(gray_img) - y - h
-            zoomed[i][0] = faces[i]
-            #print(zoomed)
+    cv2.imshow('test: ', img)
 
-            #print(len(gray_img))
-            #print(len(gray_img[0]))
 
-            head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
-            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-        # ------SHOW ZOOMED------#
-
-        # cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
-        # cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
-
-    cv2.imshow('Live: ', img)
-    # ------SHOW ZOOMED------#
-    if YAML_DATA['display_face_detection_zoomed'] == True:
-        removed = []
-        for i in range(len(zoomed)):
-            # print(zoomed[i][0])
-            # print(zoomed[i][1])
-            if zoomed[i][0] == zoomed[i][1]:
-                cv2.destroyWindow('Zoom in ' + str(i + 1))
-                removed.append(zoomed[i])
-            else:
-                zoomed[i][1] = zoomed[i][0]
-        for x in removed:
-            zoomed.remove(x)
-    # ------SHOW ZOOMED------#
 
 
     k = cv2.waitKey(30) & 0xff
