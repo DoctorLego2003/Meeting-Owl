@@ -5,6 +5,9 @@ face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml
 
 cap = cv2.VideoCapture(0)
 start = None
+def close_window(window):
+    cv2.destroyWindow(window)
+
 
 while True:
     ret, img = cap.read()
@@ -45,15 +48,19 @@ while True:
         #print(len(gray_img[0]))
         cv2.imshow('Zoom in ' + str(i + 1), zoomed[i])
         cv2.resizeWindow('Zoom in ' + str(i+1), 300, 300)
-        if 'hoofd'+str(i+1) in listheads:
-            print(listheads['hoofd'+str(i+1)])
-            if listheads['hoofd'+str(i+1)] == (x, y):
-                print('hoofd' + str(i+1))
-                listheads.pop('hoofd' + str(i+1))
-        listheads['hoofd'+str(i+1)] = [x, y]
-
-
         print(listheads)
+        if 'hoofd'+str(i+1) in listheads:
+            print("hoofd" + str(i+1))
+            print("test", listheads['hoofd' + str(i + 1)][0])
+            print("x", x)
+            if listheads['hoofd'+str(i+1)][0] == x:
+                close_window("Zoom in "+ str(i+1))
+                listheads.pop('hoofd' + str(i+1))
+
+        if 'hoofd'+str(i+1) in listheads or listheads == {}:
+            listheads['hoofd'+str(i+1)] = [x, y]
+
+
 
     cv2.imshow('Face Recognition', img)
     #if start and zoomed.all() is not None:
