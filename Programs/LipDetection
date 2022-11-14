@@ -79,7 +79,7 @@ while True:
         lip_dist, distancevorige = (cal_yawn(shape, distancevorige))
         lip_dist = int(lip_dist)
         distancevorige = int(distancevorige)
-        verschil = abs(lip_dist-distancevorige)
+        verschil = abs(lip_dist - distancevorige)
         for (x, y, w, h) in gezicht:
             relatief_verschil = 100*verschil/w
             print(relatief_verschil)
