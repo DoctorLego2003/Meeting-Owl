@@ -83,7 +83,7 @@ def distance(point_one, point_two):
 def track(faces, zoomed):
     if len(zoomed) == 0:
         return faces
-    print('zoomed: ', zoomed)
+    #print('zoomed: ', zoomed)
     dist = []
     for i in range(len(zoomed)):
         dist.append([])
@@ -108,7 +108,7 @@ def track(faces, zoomed):
                         dist[i][index_new] = -1
                 else:
                     min_ind[i].append(dist[i].index(mini))
-    print('min_ind:', min_ind)
+    #print('min_ind:', min_ind)
     i = 0
     while i < len(min_ind):
         if len(min_ind[i]) > 1:
@@ -127,13 +127,13 @@ def track(faces, zoomed):
 
     if len(new_faces) < len(faces):
         all_index = [x for x in range(len(faces))]
-        missing_index = list(filter(lambda x:[x] not in min_ind, all_index))
-        print('missing_index:', missing_index)
+        missing_index = list(filter(lambda x: [x] not in min_ind, all_index))
+        #print('missing_index:', missing_index)
         for missing in missing_index:
             new_faces.append(faces[missing])
         print('new:', new_faces)
-    print('faces: ', faces)
-    print('new_faces: ', new_faces)
+    #print('faces: ', faces)
+    #print('new_faces: ', new_faces)
     return new_faces
 
 try:
@@ -148,12 +148,12 @@ while True:
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img)
-    print('faces:', faces, len(faces))
+    #print('faces:', faces, len(faces))
     faces = track(faces, zoomed)
 
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
-            zoomed.append([[], []])
+            zoomed.append([[], 0, str()])
         (x, y, w, h) = faces[i]
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         rec_gray = gray_img[y:y + h, x:x + w]
@@ -170,17 +170,51 @@ while True:
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
-        zoomed[i][0] = faces[i]
+        if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
+            zoomed[i][0] = faces[i]
+            if zoomed[i][1] < 10:
+                zoomed[i][1] += 1
+        else:
+            if zoomed[i][1] >= 0:
+                zoomed[i][1] -= 0
         #print(zoomed)
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
-        cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+        if (zoomed[i][1] >= 5) and (zoomed[i][1] <= 10):
+            head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+        if zoomed[i][1] == 0:
+            cv2.destroyWindow('Zoom in ' + str(i + 1))
+            zoomed.remove(zoomed[i])
         #cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
         #cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
+    for i in range(len(faces), len(zoomed)):
+        print('i:', i)
+        if zoomed[i][1] > 0:
+            [x, y, w, h] = zoomed[i][0]
+            htot = 3 * h // 2
+            wtot = 3 * w // 2
+            h2 = (htot - h) // 2
+            w2 = (wtot - w) // 2
+            if y < h2:
+                h2 = y
+            if x + w2 + w > len(gray_img[0]):
+                w2 = len(gray_img[0]) - w - x
+            if x < w2:
+                w2 = x
+            if y + h + h2 > len(gray_img):
+                h2 = len(gray_img) - y - h
+            head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+            zoomed[i][1] -= 1
+        if zoomed[i][1] == 0:
+            cv2.destroyWindow('Zoom in ' + str(i + 1))
+            zoomed.remove(zoomed[i])
 
     cv2.imshow('Live: ', img)
+
+    '''
     removed = []
     for i in range(len(zoomed)):
         # print(zoomed[i][0])
@@ -192,7 +226,7 @@ while True:
             zoomed[i][1] = zoomed[i][0]
     for x in removed:
         zoomed.remove(x)
-
+    '''
     k = cv2.waitKey(30) & 0xff
     if k == ord('q'):
         break
