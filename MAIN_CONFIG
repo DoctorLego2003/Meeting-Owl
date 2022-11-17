@@ -1,0 +1,25 @@
+# YAML installeren met "pip install pyyaml" in conda shit
+
+# ------SETUP------#
+# gewoon face_detection tonen op output
+display_face_detection: True
+# zoomed in windows tonen als extra output
+display_face_detection_zoomed: True
+# namen tonen bij hoofden enz.
+display_face_recognition: False
+# lip overlay en "talking" indicator tonen
+display_lip_detection: True
+# tonen van fps counter
+display_FPS: True
+# ------SETUP------#
+
+
+
+# ------CONSTANTEN------#
+# hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
+yawn_threshold: 35
+
+tracking_treshhold_low: 20
+tracking_treshhold_high: 30
+# ------CONSTANTEN------#
+
