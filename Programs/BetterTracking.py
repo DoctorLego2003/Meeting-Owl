@@ -1,3 +1,5 @@
+import copy
+
 import cv2
 import numpy
 # prev = []
@@ -192,42 +194,49 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 if zoomed[i][1] >= 0:
                     zoomed[i][1] -= 0
 
-
-
             if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
                 head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+
+                main_lip_detection(head_frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+
                 cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+
+                # zoomed_section = copy.deepcopy(img[y:y + h, x:x + w])
+                # zoomed_section = copy.deepcopy(img[y - h2: y + h2 + h, x - w2: x + w2 + w])
+                # frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade
+                # main_lip_detection(head_frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+
             if zoomed[i][1] == 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
                 zoomed.remove(zoomed[i])
 
-        for i in range(len(faces), len(zoomed)):
-            if i >= len(zoomed):
-                break
-            print('i:', i)
-            if zoomed[i][1] > 0:
-                zoomed[i][1] -= 1
-                if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
-                    [x, y, w, h] = zoomed[i][0]
-                    htot = 3 * h // 2
-                    wtot = 3 * w // 2
-                    h2 = (htot - h) // 2
-                    w2 = (wtot - w) // 2
-                    if y < h2:
-                        h2 = y
-                    if x + w2 + w > len(gray_img[0]):
-                        w2 = len(gray_img[0]) - w - x
-                    if x < w2:
-                        w2 = x
-                    if y + h + h2 > len(gray_img):
-                        h2 = len(gray_img) - y - h
-                    head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
-                    cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-            print('zoomed:', zoomed)
-            if zoomed[i][1] == 0:
-                if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
-                    cv2.destroyWindow('Zoom in ' + str(i + 1))
-                zoomed.remove(zoomed[i])
+    for i in range(len(faces), len(zoomed)):
+        if i >= len(zoomed):
+            break
+        print('i:', i)
+        if zoomed[i][1] > 0:
+            zoomed[i][1] -= 1
+            if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
+                [x, y, w, h] = zoomed[i][0]
+                htot = 3 * h // 2
+                wtot = 3 * w // 2
+                h2 = (htot - h) // 2
+                w2 = (wtot - w) // 2
+                if y < h2:
+                    h2 = y
+                if x + w2 + w > len(gray_img[0]):
+                    w2 = len(gray_img[0]) - w - x
+                if x < w2:
+                    w2 = x
+                if y + h + h2 > len(gray_img):
+                    h2 = len(gray_img) - y - h
+                head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+        print('zoomed:', zoomed)
+        if zoomed[i][1] == 0:
+            if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
+                cv2.destroyWindow('Zoom in ' + str(i + 1))
+            zoomed.remove(zoomed[i])
 
         # cv2.imshow('Live: ', img)
 

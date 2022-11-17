@@ -104,7 +104,7 @@ while True:
     #     main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
     # ------LipDetection------#
 
-    cv2.imshow('test: ', img)
+    cv2.imshow('Live: ', img)
 
 
 
