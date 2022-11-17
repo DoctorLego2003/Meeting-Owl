@@ -133,7 +133,7 @@ def track(faces, zoomed):
         #print('missing_index:', missing_index)
         for missing in missing_index:
             new_faces.append(faces[missing])
-        print('new:', new_faces)
+        #print('new:', new_faces)
     #print('faces: ', faces)
     #print('new_faces: ', new_faces)
     return new_faces
@@ -184,6 +184,7 @@ while True:
         #print(len(gray_img))
         #print(len(gray_img[0]))
         if (zoomed[i][1] >= treshhold_low) and (zoomed[i][1] <= treshhold_high):
+            print('zoomed[i]:', zoomed[i])
             head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
             cv2.imshow('Zoom in ' + str(i + 1), head_frame)
         if zoomed[i][1] == 0:
@@ -194,10 +195,10 @@ while True:
     for i in range(len(faces), len(zoomed)):
         if i >= len(zoomed):
             break
-        print('i:', i)
+        #print('i:', i)
         if zoomed[i][1] > 0:
             zoomed[i][1] -= 1
-            if zoomed[i][1] != 0:
+            if zoomed[i][1] >= treshhold_low:
                 [x, y, w, h] = zoomed[i][0]
                 htot = 3 * h // 2
                 wtot = 3 * w // 2
@@ -217,6 +218,7 @@ while True:
         if zoomed[i][1] == 0:
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE ) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
+                print('Screen away!!')
             zoomed.remove(zoomed[i])
 
     cv2.imshow('Live: ', img)
