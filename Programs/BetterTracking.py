@@ -2,7 +2,8 @@ import cv2
 import numpy
 prev = []
 zoomed = []
-treshhold = 30
+treshhold_low = 20
+treshhold_high = 30
 face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
@@ -173,7 +174,7 @@ while True:
             h2 = len(gray_img) - y - h
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
             zoomed[i][0] = faces[i]
-            if zoomed[i][1] < treshhold:
+            if zoomed[i][1] < treshhold_high:
                 zoomed[i][1] += 1
         else:
             if zoomed[i][1] >= 0:
@@ -182,7 +183,7 @@ while True:
 
         #print(len(gray_img))
         #print(len(gray_img[0]))
-        if (zoomed[i][1] >= treshhold//2) and (zoomed[i][1] <= treshhold):
+        if (zoomed[i][1] >= treshhold_low) and (zoomed[i][1] <= treshhold_high):
             head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
             cv2.imshow('Zoom in ' + str(i + 1), head_frame)
         if zoomed[i][1] == 0:
