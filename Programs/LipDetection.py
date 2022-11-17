@@ -42,7 +42,10 @@ def cal_yawn(shape, distancevorige):
 
 
 # while True:
-def main_lip_detection(frame, distancevorige, gray_img, face_model, landmark_model, face_cascade):
+def main_lip_detection(frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade):
+    yawn_thresh = YAML_DATA['yawn_threshold']
+
+
     # ret, img = cam.read()
     # gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gezicht = face_cascade.detectMultiScale(gray_img, 1.25, 4)
@@ -90,7 +93,7 @@ def main_lip_detection(frame, distancevorige, gray_img, face_model, landmark_mod
         verschil = abs(lip_dist - distancevorige)
         for (x, y, w, h) in gezicht:
             relatief_verschil = 100*verschil/w
-            print(relatief_verschil)
+            # print(relatief_verschil)
             if relatief_verschil >= 1:
                 cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)

@@ -5,6 +5,9 @@ import numpy
 # face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 # profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
+from .LipDetection import *
+
+
 def intersection(a,b):
   x = max(a[0], b[0])
   y = max(a[1], b[1])
@@ -108,7 +111,7 @@ def track(faces, zoomed):
                         dist[i][index_new] = -1
                 else:
                     min_ind[i].append(dist[i].index(mini))
-    print('min_ind:', min_ind)
+    # print('min_ind:', min_ind)
     i = 0
     while i < len(min_ind):
         if len(min_ind[i]) > 1:
@@ -128,12 +131,12 @@ def track(faces, zoomed):
     if len(new_faces) < len(faces):
         all_index = [x for x in range(len(faces))]
         missing_index = list(filter(lambda x:[x] not in min_ind, all_index))
-        print('missing_index:', missing_index)
+        # print('missing_index:', missing_index)
         for missing in missing_index:
             new_faces.append(faces[missing])
-        print('new:', new_faces)
-    print('faces: ', faces)
-    print('new_faces: ', new_faces)
+        # print('new:', new_faces)
+    # print('faces: ', faces)
+    # print('new_faces: ', new_faces)
     return new_faces
 
 # try:
@@ -145,13 +148,13 @@ def track(faces, zoomed):
 
 
 # while True:
-def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade):
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model):
 
 #     ret, img = cap.read()
 #     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
-    print('faces:', faces, len(faces))
+    # print('faces:', faces, len(faces))
     faces = track(faces, zoomed)
 #
     for i in range(len(faces)):
@@ -163,6 +166,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
         if YAML_DATA['display_face_detection'] == True:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         # -----SHOW RECTANGLE-----#
+
 
         # ------SHOW ZOOMED------#
         if YAML_DATA['display_face_detection_zoomed'] == True:
@@ -181,11 +185,23 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             if y + h + h2 > len(gray_img):
                 h2 = len(gray_img) - y - h
             zoomed[i][0] = faces[i]
-            #print(zoomed)
+            print(zoomed)
+
+
+
+            # MOETEN WE NOG FIXEN !!!!!!
+            # ------LipDetection------#
+            # main_lip_detection(img, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+            # ------LipDetection------#
+
+
 
             #print(len(gray_img))
             #print(len(gray_img[0]))
+
+            # if YAML_DATA['display_lip_detection'] == True:
             head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+
             cv2.imshow('Zoom in ' + str(i + 1), head_frame)
             #cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
             #cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
