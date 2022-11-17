@@ -169,6 +169,16 @@ def track(faces, zoomed):
 # except:
 #     cap = cv2.VideoCapture(0)
 
+def check_for_doubles(zoomed):
+    for i in range(len(zoomed)):
+        for j in range(i+1, len(zoomed)):
+            if zoomed[i][0] == zoomed[j][0] and zoomed[i][1] == zoomed[j][1]:
+                zoomed.remove(zoomed[j])
+                print('new zoom: ', zoomed)
+def check_for_empty(zoomed):
+    for i in range(len(zoomed)):
+        if len(zoomed[i][0]) != 4:
+            zoomed.remove(zoomed[i])
 
 # while True:
 def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model):
@@ -179,7 +189,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed)
-#
+    check_for_doubles(zoomed)
+    check_for_empty(zoomed)
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
             zoomed.append([[], 0, str()])
