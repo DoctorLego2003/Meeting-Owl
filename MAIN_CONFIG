@@ -18,5 +18,8 @@ display_FPS: True
 # ------CONSTANTEN------#
 # hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
 yawn_threshold: 35
+
+tracking_treshhold_low: 20
+tracking_treshhold_high: 30
 # ------CONSTANTEN------#
 
