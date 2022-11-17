@@ -30,7 +30,11 @@ with open("MAIN_CONFIG", "r") as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
+
 print(YAML_DATA)
+# for key in YAML_DATA:
+#     print(key, "=", YAML_DATA[key], "|", end=" ")
+# print("\n")
 
 
 
@@ -91,13 +95,14 @@ while True:
     # ---------FPS------------#
 
     # ------Tracking------#
-    main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade)
+    main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
     # ------Tracking------#
 
 
     # ------LipDetection------#
     if YAML_DATA['display_lip_detection'] == True:
-        main_lip_detection(img, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+            # and YAML_DATA['display_face_detection_zoomed'] == False:
+        main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
     # ------LipDetection------#
 
     cv2.imshow('test: ', img)
