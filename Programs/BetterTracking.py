@@ -135,8 +135,17 @@ def track(faces, zoomed):
         for missing in missing_index:
             new_faces.append(faces[missing])
         # print('new:', new_faces)
-    # print('faces: ', faces)
-    # print('new_faces: ', new_faces)
+    print("------------------------------------------------------------------------------------------------------------")
+    print('zoomed: ', zoomed)
+    print('faces: ', faces)
+    print('new_faces: ', new_faces)
+    print("------------------------------------------------------------------------------------------------------------")
+
+    if len(zoomed) == len(new_faces):
+        c = 0.8
+        for i in range(len(zoomed)):
+            for j in range(4):
+                new_faces[i][j] = int(c * new_faces[i][j] + (1 - c) * zoomed[i][0][j])
     return new_faces
 
 # try:
@@ -229,7 +238,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     cv2.destroyWindow('Zoom in ' + str(i + 1))
                 zoomed.remove(zoomed[i])
 
-        # cv2.imshow('Live: ', img)
+        #cv2.imshow('Live: ', img)
 
 
 
