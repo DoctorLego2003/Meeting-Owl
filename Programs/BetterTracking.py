@@ -1,9 +1,12 @@
 import cv2
 import numpy
-prev = []
-zoomed = []
-face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
-profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
+# prev = []
+# zoomed = []
+# face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
+# profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
+
+from .LipDetection import *
+
 
 def intersection(a,b):
   x = max(a[0], b[0])
@@ -13,7 +16,7 @@ def intersection(a,b):
   if w<0 or h<0: return False
   return True
 
-def detect_face_orientation(img):
+def detect_face_orientation(gray_img, face_cascade, profile_cascade):
     faces = []
     front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
@@ -55,7 +58,7 @@ def detect_face_orientation(img):
                     faces.append(face)
     if len(right_profile) != 0:
         for face in right_profile:
-            w, h = img.shape
+            w, h = gray_img.shape
             x = face[0]
             new_x = w - x - 1
             face[0] = new_x
@@ -108,7 +111,7 @@ def track(faces, zoomed):
                         dist[i][index_new] = -1
                 else:
                     min_ind[i].append(dist[i].index(mini))
-    print('min_ind:', min_ind)
+    # print('min_ind:', min_ind)
     i = 0
     while i < len(min_ind):
         if len(min_ind[i]) > 1:
@@ -128,74 +131,124 @@ def track(faces, zoomed):
     if len(new_faces) < len(faces):
         all_index = [x for x in range(len(faces))]
         missing_index = list(filter(lambda x:[x] not in min_ind, all_index))
-        print('missing_index:', missing_index)
+        # print('missing_index:', missing_index)
         for missing in missing_index:
             new_faces.append(faces[missing])
-        print('new:', new_faces)
+        # print('new:', new_faces)
+    print("------------------------------------------------------------------------------------------------------------")
+    print('zoomed: ', zoomed)
     print('faces: ', faces)
     print('new_faces: ', new_faces)
+    print("------------------------------------------------------------------------------------------------------------")
+
+    if len(zoomed) == len(new_faces):
+        c = 0.8
+        for i in range(len(zoomed)):
+            for j in range(4):
+                new_faces[i][j] = int(c * new_faces[i][j] + (1 - c) * zoomed[i][0][j])
     return new_faces
 
-try:
-    cap = cv2.VideoCapture(1)
-    ret, img = cap.read()
-    assert len(img) > 0
-except:
-    cap = cv2.VideoCapture(0)
+# try:
+#     cap = cv2.VideoCapture(1)
+#     ret, img = cap.read()
+#     assert len(img) > 0
+# except:
+#     cap = cv2.VideoCapture(0)
 
-while True:
-    ret, img = cap.read()
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    faces = detect_face_orientation(gray_img)
-    print('faces:', faces, len(faces))
+
+# while True:
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model):
+
+#     ret, img = cap.read()
+#     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
+    # print('faces:', faces, len(faces))
     faces = track(faces, zoomed)
-
+#
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
-            zoomed.append([[], []])
+            zoomed.append([[], 0, str()])
         (x, y, w, h) = faces[i]
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-        rec_gray = gray_img[y:y + h, x:x + w]
-        rec_color = img[y:y + h, x:x + w]
-        htot = 3 * h//2
-        wtot = 3 * w//2
-        h2 = (htot - h)//2
-        w2 = (wtot - w)//2
-        if y < h2:
-            h2 = y
-        if x + w2 + w > len(gray_img[0]):
-            w2 = len(gray_img[0]) - w - x
-        if x < w2:
-            w2 = x
-        if y + h + h2 > len(gray_img):
-            h2 = len(gray_img) - y - h
-        zoomed[i][0] = faces[i]
-        #print(zoomed)
 
-        #print(len(gray_img))
-        #print(len(gray_img[0]))
-        head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
-        cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-        #cv2.resizeWindow('Zoom in ' + str(i+1), 400, 400)
-        #cv2.resizeWindow('Zoom in ' + str(i + 1), 325, 325)
+        # -----SHOW RECTANGLE-----#
+        if YAML_DATA['display_face_detection'] == True:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+        # -----SHOW RECTANGLE-----#
 
-    cv2.imshow('Live: ', img)
-    removed = []
-    for i in range(len(zoomed)):
-        # print(zoomed[i][0])
-        # print(zoomed[i][1])
-        if zoomed[i][0] == zoomed[i][1]:
-            cv2.destroyWindow('Zoom in ' + str(i + 1))
-            removed.append(zoomed[i])
-        else:
-            zoomed[i][1] = zoomed[i][0]
-    for x in removed:
-        zoomed.remove(x)
 
-    k = cv2.waitKey(30) & 0xff
-    if k == ord('q'):
-        break
+        # ------SHOW ZOOMED------#
+        if YAML_DATA['display_face_detection_zoomed'] == True:
+            rec_gray = gray_img[y:y + h, x:x + w]
+            rec_color = img[y:y + h, x:x + w]
+            htot = 3 * h // 2
+            wtot = 3 * w // 2
+            h2 = (htot - h) // 2
+            w2 = (wtot - w) // 2
+            if y < h2:
+                h2 = y
+            if x + w2 + w > len(gray_img[0]):
+                w2 = len(gray_img[0]) - w - x
+            if x < w2:
+                w2 = x
+            if y + h + h2 > len(gray_img):
+                h2 = len(gray_img) - y - h
+            if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
+                zoomed[i][0] = faces[i]
+                if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
+                    zoomed[i][1] += 1
+            else:
+                if zoomed[i][1] >= 0:
+                    zoomed[i][1] -= 0
 
-cap.release()
-cv2.destroyAllWindows()
+
+
+            if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
+                head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+            if zoomed[i][1] == 0:
+                cv2.destroyWindow('Zoom in ' + str(i + 1))
+                zoomed.remove(zoomed[i])
+
+        for i in range(len(faces), len(zoomed)):
+            if i >= len(zoomed):
+                break
+            print('i:', i)
+            if zoomed[i][1] > 0:
+                zoomed[i][1] -= 1
+                if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
+                    [x, y, w, h] = zoomed[i][0]
+                    htot = 3 * h // 2
+                    wtot = 3 * w // 2
+                    h2 = (htot - h) // 2
+                    w2 = (wtot - w) // 2
+                    if y < h2:
+                        h2 = y
+                    if x + w2 + w > len(gray_img[0]):
+                        w2 = len(gray_img[0]) - w - x
+                    if x < w2:
+                        w2 = x
+                    if y + h + h2 > len(gray_img):
+                        h2 = len(gray_img) - y - h
+                    head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                    cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+            print('zoomed:', zoomed)
+            if zoomed[i][1] == 0:
+                if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
+                    cv2.destroyWindow('Zoom in ' + str(i + 1))
+                zoomed.remove(zoomed[i])
+
+        #cv2.imshow('Live: ', img)
+
+
+
+            # # MOETEN WE NOG FIXEN !!!!!!
+            # # ------LipDetection------#
+            # # for i in zoomed
+            # # (x, y, w, h) = faces[i]
+            # zoomed_section = img[y:y + h, x:x + w]
+            # # frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade
+            # main_lip_detection(zoomed_section, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+            # # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+            # # ------LipDetection------#
+
