@@ -27,8 +27,8 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
     return distancenu, distancevorige, breedtemondnu, breedtemondvorige
 
 
-#cam = cv2.VideoCapture('C:/Users/arnel/OneDrive/Documents/Burgi/Semester 3/Peno/Tests/Spraak/Test 2 speech.mp4')
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture('C:/Users/arnel/OneDrive/Documents/Burgi/Semester 3/Peno/Tests/Spraak/Test 6 speech.mp4')
+#cam = cv2.VideoCapture(0)
 # -------Models---------#
 face_model = dlib.get_frontal_face_detector()
 landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
