@@ -52,7 +52,7 @@ from Programs.LipDetection import *
 
 
 # ------face recognition------#
-from Programs.test.main import *
+
 # ------face recognition------#
 
 
@@ -110,7 +110,7 @@ while True:
 
     # ------FaceRecogntion------#
     if YAML_DATA['display_face_recognition'] == True:
-        faceRecogntion(img)
+        None
     # ------FaceRecogntion------#
 
 
