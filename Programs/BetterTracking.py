@@ -79,6 +79,8 @@ def detect_face_orientation(gray_img, face_cascade, profile_cascade):
         #assert y >= 0
         #assert w >= 0
         #assert h >= 0
+    check_for_double_faces(faces)
+    check_for_empty_faces(faces)
     return faces
 
 def distance(point_one, point_two):
@@ -158,8 +160,13 @@ def track(faces, zoomed):
         for i in range(len(missing_index)):
             new_faces.append(faces[missing_index[i]])
         #print('new:', new_faces)
-    print('faces: ', faces)
-    print('new_faces: ', new_faces)
+    #print('faces: ', faces)
+    #print('new_faces: ', new_faces)
+    print('faces1:', faces)
+    check_for_double_faces(new_faces)
+    print('faces2:', faces)
+    check_for_empty_faces(new_faces)
+    print('faces3:', faces)
     return new_faces
 
 # try:
@@ -171,14 +178,39 @@ def track(faces, zoomed):
 
 def check_for_doubles(zoomed):
     for i in range(len(zoomed)):
-        for j in range(i+1, len(zoomed)):
+        j = i + 1
+        while j < len(zoomed):
             if zoomed[i][0] == zoomed[j][0] and zoomed[i][1] == zoomed[j][1]:
                 zoomed.remove(zoomed[j])
-                print('new zoom: ', zoomed)
+                #print('new zoom: ', zoomed)
+            else:
+                j += 1
+def check_for_double_faces(faces):
+    i = 0
+    while i < len(faces):
+        j = i + 1
+        while j < len(faces):
+            if faces[i] == faces[j]:
+                faces.remove(faces[j])
+            else:
+                j += 1
+        i += 1
+
+def check_for_empty_faces(faces):
+    i = 0
+    while i < len(faces):
+        if len(faces[i]) == 0:
+            faces.remove(faces[i])
+        else:
+            i += 1
+
 def check_for_empty(zoomed):
-    for i in range(len(zoomed)):
+    i = 0
+    while i < len(zoomed):
         if len(zoomed[i][0]) != 4:
             zoomed.remove(zoomed[i])
+        else:
+            i += 1
 
 # while True:
 def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model):
