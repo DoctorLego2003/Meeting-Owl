@@ -85,6 +85,7 @@ def distance(point_one, point_two):
     #print(dist)
     return dist
 
+
 def track(faces, zoomed):
     if len(zoomed) == 0:
         return faces
@@ -197,7 +198,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
                 head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
 
-                main_lip_detection(head_frame, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+                main_lip_detection(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
 
                 cv2.imshow('Zoom in ' + str(i + 1), head_frame)
 

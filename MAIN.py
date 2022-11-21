@@ -52,7 +52,7 @@ from Programs.LipDetection import *
 
 
 # ------face recognition------#
-
+from Programs.test.main import *
 # ------face recognition------#
 
 
@@ -100,13 +100,19 @@ while True:
 
 
     # ------LipDetection------#
-    # if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
-    #     main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
+        main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
     # ------LipDetection------#
 
+
+
+    # ------FaceRecogntion------#
+    if YAML_DATA['display_face_recognition'] == True:
+        faceRecogntion(img)
+    # ------FaceRecogntion------#
+
+
     cv2.imshow('Live: ', img)
-
-
 
 
     k = cv2.waitKey(30) & 0xff
