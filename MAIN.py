@@ -78,6 +78,8 @@ try:
 except:
     cap = cv2.VideoCapture(0)
 
+# cap= cv2.VideoCapture('Programs/test_footage/IMG_8235.mp4')
+
 while True:
     ret, img = cap.read()
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
