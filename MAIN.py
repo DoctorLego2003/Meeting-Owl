@@ -48,6 +48,7 @@ from Programs.BetterTracking import *
 # ------lip detection------#
 distancevorige = 0
 from Programs.LipDetection import *
+from Programs.LipDetectie2 import *
 # ------lip detection------#
 
 
@@ -103,7 +104,11 @@ while True:
 
     # ------LipDetection------#
     if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
-        main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+        # OLD
+        # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+        # NEW
+        main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model)
+        # None
     # ------LipDetection------#
 
 

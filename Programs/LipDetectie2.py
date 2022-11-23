@@ -4,11 +4,8 @@ import dlib
 import time
 from scipy.spatial import distance as dist
 from imutils import face_utils
-distancevorige = 0
-breedtemondvorige = 1
-zerocount = 0
-talklist = 0
-Talking = False
+
+
 def cal_yawn(shape, distancevorige, breedtemondvorige):
     top_lip = shape[50:53]
     top_lip = np.concatenate((top_lip, shape[61:64]))
@@ -28,33 +25,45 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
 
 #cam = cv2.VideoCapture('C:/Users/arnel/OneDrive/Documents/Burgi/Semester 3/Peno/Tests/Spraak/Test 2 speech.mp4')
-cam = cv2.VideoCapture(0)
+# cam = cv2.VideoCapture(0)
 # -------Models---------#
-face_model = dlib.get_frontal_face_detector()
-landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
+# face_model = dlib.get_frontal_face_detector()
+# landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 # --------Variables-------#
-yawn_thresh = 35
-ptime = 0
-while True:
+# yawn_thresh = 35
 
-    ret, img = cam.read()
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# ptime = 0
+# while True:
+def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
+    distancevorige = 0
+    breedtemondvorige = 1
+    zerocount = 0
+    talklist = 0
+    Talking = False
 
 
-    suc, frame = cam.read()
 
-    if not suc:
-        break
+    # yawn_tresh = YAML_DATA['yawn_threshold']
 
-    # ---------FPS------------#
-    ctime = time.time()
-    fps = int(1 / (ctime - ptime))
-    ptime = ctime
-    cv2.putText(frame, f'FPS:{fps}', (frame.shape[1] - 120, frame.shape[0] - 20), cv2.FONT_HERSHEY_PLAIN, 2,
-               (0, 200, 0), 3)
+    # ret, img = cam.read()
+    # gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #
+    #
+    # suc, frame = cam.read()
+    #
+    # if not suc:
+    #     break
+
+    # # ---------FPS------------#
+    # ctime = time.time()
+    # fps = int(1 / (ctime - ptime))
+    # ptime = ctime
+    # cv2.putText(frame, f'FPS:{fps}', (frame.shape[1] - 120, frame.shape[0] - 20), cv2.FONT_HERSHEY_PLAIN, 2,
+    #            (0, 200, 0), 3)
 
     # ------Detecting face------#
-    img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    img_gray = gray_img
     faces = face_model(img_gray)
     for face in faces:
 
@@ -116,9 +125,9 @@ while True:
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 
-    cv2.imshow('Webcam', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    # cv2.imshow('Webcam', frame)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
 
-cam.release()
-cv2.destroyAllWindows()
+# cam.release()
+# cv2.destroyAllWindows()
