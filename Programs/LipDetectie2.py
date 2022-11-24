@@ -4,11 +4,9 @@ import dlib
 import time
 from scipy.spatial import distance as dist
 from imutils import face_utils
-distancevorige = 0
-breedtemondvorige = 1
-zerocount = 0
-talklist = 0
-Talking = False
+
+
+
 def cal_yawn(shape, distancevorige, breedtemondvorige):
     top_lip = shape[50:53]
     top_lip = np.concatenate((top_lip, shape[61:64]))
@@ -28,33 +26,45 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
 
 #cam = cv2.VideoCapture('C:/Users/arnel/OneDrive/Documents/Burgi/Semester 3/Peno/Tests/Spraak/Test 2 speech.mp4')
-cam = cv2.VideoCapture(0)
+# cam = cv2.VideoCapture(0)
 # -------Models---------#
-face_model = dlib.get_frontal_face_detector()
-landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
+# face_model = dlib.get_frontal_face_detector()
+# landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 # --------Variables-------#
-yawn_thresh = 35
-ptime = 0
-while True:
+# yawn_thresh = 35
 
-    ret, img = cam.read()
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# ptime = 0
+# while True:
+def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking):
+    # distancevorige = 0
+    # breedtemondvorige = 1
+    # zerocount = 0
+    # talklist = 0
+    # Talking = False
 
+    print("running")
 
-    suc, frame = cam.read()
+    # yawn_tresh = YAML_DATA['yawn_threshold']
 
-    if not suc:
-        break
+    # ret, img = cam.read()
+    # gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #
+    #
+    # suc, frame = cam.read()
+    #
+    # if not suc:
+    #     break
 
-    # ---------FPS------------#
-    ctime = time.time()
-    fps = int(1 / (ctime - ptime))
-    ptime = ctime
-    cv2.putText(frame, f'FPS:{fps}', (frame.shape[1] - 120, frame.shape[0] - 20), cv2.FONT_HERSHEY_PLAIN, 2,
-               (0, 200, 0), 3)
+    # # ---------FPS------------#
+    # ctime = time.time()
+    # fps = int(1 / (ctime - ptime))
+    # ptime = ctime
+    # cv2.putText(frame, f'FPS:{fps}', (frame.shape[1] - 120, frame.shape[0] - 20), cv2.FONT_HERSHEY_PLAIN, 2,
+    #            (0, 200, 0), 3)
 
     # ------Detecting face------#
-    img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    img_gray = gray_img
     faces = face_model(img_gray)
     for face in faces:
 
@@ -70,7 +80,7 @@ while True:
 
         # -------Calculating the lip distance-----#
 
-        lip_dist, distancevorige, breedtemond, breedtemondvorige  = (cal_yawn(shape, distancevorige, breedtemondvorige))
+        lip_dist, distancevorige, breedtemond, breedtemondvorige = (cal_yawn(shape, distancevorige, breedtemondvorige))
         lip_dist = int(lip_dist)
         breedtemond = int(breedtemond)
         distancevorige = int(distancevorige)
@@ -83,11 +93,12 @@ while True:
         #print(verschilmond)
         #print("verschillip",verschillip)
         #print("verschilmond", verschilmond)
-        relatief_verschil = verschillip*verschilmond
+        relatief_verschil = verschillip*verschilmond*10
         print(relatief_verschil)
 
 
-        if relatief_verschil >=10:
+        # if relatief_verschil >=10:
+        if relatief_verschil >= YAML_DATA['relatief_verschil_waarde']:
             talklist += 1
             #print(talklist)
             #if zerocount >= 10:
@@ -98,7 +109,8 @@ while True:
                 #print("Talking")
         else:
             zerocount += 1
-            if zerocount >= 20:
+            # if zerocount >= 10:
+            if zerocount >= YAML_DATA['zerocount_buffer_count']:
                 zerocount = 0
                 talklist = 0
                 Talking = False
@@ -116,9 +128,11 @@ while True:
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 
-    cv2.imshow('Webcam', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    return distancevorige, breedtemondvorige, zerocount, talklist, Talking
 
-cam.release()
-cv2.destroyAllWindows()
+    # cv2.imshow('Webcam', frame)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
+
+# cam.release()
+# cv2.destroyAllWindows()
