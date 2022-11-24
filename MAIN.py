@@ -110,7 +110,7 @@ while True:
 
 
     # ------LipDetection------#
-    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == True:
+    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
         # OLD
         # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
         # NEW
