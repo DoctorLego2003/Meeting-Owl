@@ -143,9 +143,6 @@ def track(faces, zoomed):
             new_faces.append(faces[index[0]])
         else:
             missing_index.append(i)
-    # print('missing_index1:', missing_index)
-    if (len(new_faces) > 0) and (len(missing_index) > 0):
-        # print('missing_index:', missing_index)
     #print('missing_index1:', missing_index)
     if (len(new_faces) > 0) and (len(missing_index) > 0):
         #print('missing_index:', missing_index)
