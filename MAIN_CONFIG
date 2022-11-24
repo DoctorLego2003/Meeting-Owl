@@ -3,9 +3,9 @@
 
 # ------SETUP------#
 # gewoon face_detection tonen op output
-display_face_detection: False
+display_face_detection: True
 # zoomed in windows tonen als extra output
-display_face_detection_zoomed: False
+display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
@@ -18,9 +18,17 @@ display_FPS: True
 
 # ------CONSTANTEN------#
 # hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
-yawn_threshold: 35
 
+
+# tracking
 tracking_treshhold_low: 10
 tracking_treshhold_high: 30
+
+# lip_detection
+yawn_threshold: 35
+relatief_verschil_waarde: 100
+zerocount_buffer_count: 10
+
+
 # ------CONSTANTEN------#
 

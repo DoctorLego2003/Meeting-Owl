@@ -97,7 +97,7 @@ def distance(point_one, point_two):
 def track(faces, zoomed):
     if len(zoomed) == 0:
         return faces
-    print('zoomed: ', zoomed)
+    # print('zoomed: ', zoomed)
     dist = []
     for i in range(len(zoomed)):
         dist.append([])
@@ -122,7 +122,7 @@ def track(faces, zoomed):
                         dist[i][index_new] = -1
                 else:
                     min_ind[i].append(dist[i].index(mini))
-    print('min_ind:', min_ind)
+    # print('min_ind:', min_ind)
     i = 0
     while i < len(min_ind):
         if len(min_ind[i]) > 1:
@@ -132,19 +132,19 @@ def track(faces, zoomed):
 
         i += 1
     #returning a reorganised faces
-    print('faces: ', faces)
+    # print('faces: ', faces)
     new_faces = []
     missing_index = []
     for i in range(len(min_ind)):
         index = min_ind[i]
-        print('index:', index)
+        # print('index:', index)
         if index != []:
             new_faces.append(faces[index[0]])
         else:
             missing_index.append(i)
-    print('missing_index1:', missing_index)
+    # print('missing_index1:', missing_index)
     if (len(new_faces) > 0) and (len(missing_index) > 0):
-        print('missing_index:', missing_index)
+        # print('missing_index:', missing_index)
         for i in range(len(missing_index)):
             min_ind.append(missing_index[i])
             if i >= len(new_faces):
@@ -157,17 +157,17 @@ def track(faces, zoomed):
     if len(new_faces) < len(faces):
         all_index = [x for x in range(len(faces))]
         missing_index = list(filter(lambda x: [x] not in min_ind, all_index))
-        print('missing_index:', missing_index)
+        # print('missing_index:', missing_index)
         for i in range(len(missing_index)):
             new_faces.append(faces[missing_index[i]])
         #print('new:', new_faces)
     #print('faces: ', faces)
     #print('new_faces: ', new_faces)
-    print('faces1:', faces)
+    # print('faces1:', faces)
     check_for_double_faces(new_faces)
-    print('faces2:', faces)
+    # print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    print('faces3:', faces)
+    # print('faces3:', faces)
 
     if len(zoomed) == len(new_faces):
         c = 0.8
@@ -279,9 +279,11 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
                 head_frame = img[y - h2: y + h2 + h, x - w2: x + w2 + w]
                 head_frame = cv2.resize(head_frame, (400, 400))
-                if YAML_DATA['display_lip_detection']:
-                    main_lip_detection(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
-                cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+
+
+                # if YAML_DATA['display_lip_detection']:
+                #     main_lip_detection(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
+                # cv2.imshow('Zoom in ' + str(i + 1), head_frame)
 
             if zoomed[i][1] == 0:
                 if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
@@ -292,7 +294,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     for i in range(len(faces), len(zoomed)):
         if i >= len(zoomed):
             break
-        print('i:', i)
+        # print('i:', i)
         if zoomed[i][1] > 0:
             zoomed[i][1] -= 1
             if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
@@ -311,7 +313,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     h2 = len(gray_img) - y - h
                 head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
                 cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-        print('zoomed:', zoomed)
+        # print('zoomed:', zoomed)
         if zoomed[i][1] == 0:
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))

@@ -6,6 +6,7 @@ from scipy.spatial import distance as dist
 from imutils import face_utils
 
 
+
 def cal_yawn(shape, distancevorige, breedtemondvorige):
     top_lip = shape[50:53]
     top_lip = np.concatenate((top_lip, shape[61:64]))
@@ -34,14 +35,14 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
 # ptime = 0
 # while True:
-def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
-    distancevorige = 0
-    breedtemondvorige = 1
-    zerocount = 0
-    talklist = 0
-    Talking = False
+def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking):
+    # distancevorige = 0
+    # breedtemondvorige = 1
+    # zerocount = 0
+    # talklist = 0
+    # Talking = False
 
-
+    print("running")
 
     # yawn_tresh = YAML_DATA['yawn_threshold']
 
@@ -79,7 +80,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
 
         # -------Calculating the lip distance-----#
 
-        lip_dist, distancevorige, breedtemond, breedtemondvorige  = (cal_yawn(shape, distancevorige, breedtemondvorige))
+        lip_dist, distancevorige, breedtemond, breedtemondvorige = (cal_yawn(shape, distancevorige, breedtemondvorige))
         lip_dist = int(lip_dist)
         breedtemond = int(breedtemond)
         distancevorige = int(distancevorige)
@@ -92,11 +93,12 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
         #print(verschilmond)
         #print("verschillip",verschillip)
         #print("verschilmond", verschilmond)
-        relatief_verschil = verschillip*verschilmond
+        relatief_verschil = verschillip*verschilmond*10
         print(relatief_verschil)
 
 
-        if relatief_verschil >=10:
+        # if relatief_verschil >=10:
+        if relatief_verschil >= YAML_DATA['relatief_verschil_waarde']:
             talklist += 1
             #print(talklist)
             #if zerocount >= 10:
@@ -107,7 +109,8 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
                 #print("Talking")
         else:
             zerocount += 1
-            if zerocount >= 20:
+            # if zerocount >= 10:
+            if zerocount >= YAML_DATA['zerocount_buffer_count']:
                 zerocount = 0
                 talklist = 0
                 Talking = False
@@ -124,6 +127,8 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model):
 
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
+
+    return distancevorige, breedtemondvorige, zerocount, talklist, Talking
 
     # cv2.imshow('Webcam', frame)
     # if cv2.waitKey(1) & 0xFF == ord('q'):

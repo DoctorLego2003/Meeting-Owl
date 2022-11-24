@@ -19,6 +19,13 @@ face_model = dlib.get_frontal_face_detector()
 landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_landmarks.dat')
 
 
+distancevorige = 0
+breedtemondvorige = 1
+zerocount = 0
+talklist = 0
+Talking = False
+
+
 # open YAML config file
 import yaml
 with open("MAIN_CONFIG", "r") as stream:
@@ -103,12 +110,24 @@ while True:
 
 
     # ------LipDetection------#
-    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
+    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == True:
         # OLD
         # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
         # NEW
-        main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model)
+        # aaaaa, bbbbb, ccccc, ddddd, eeeee
+        distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
         # None
+        # distancevorige = aaaaa
+        # breedtemondvorige = bbbbb
+        # zerocount = ccccc
+        # talklist = ddddd
+        # Talking = eeeee
+
+
+
+
+
+
     # ------LipDetection------#
 
     # ------FaceRecogntion------#
