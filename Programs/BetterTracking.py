@@ -8,6 +8,7 @@ import numpy
 # profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
 from .LipDetection import *
+from .face_recog_test_mp import *
 
 
 def intersection(a,b):
@@ -238,6 +239,17 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
         if YAML_DATA['display_face_detection'] == True:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         # -----SHOW RECTANGLE-----#
+
+
+
+        #     # ------FaceRecogntion------#
+        #     if YAML_DATA['display_face_recognition'] == True:
+        #         main_face_recogntion(img, YAML_DATA)
+        #         cv2.putText(img, "69 nice", (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+        #
+        # # ------FaceRecogntion------#
+
+
 
 
         # ------SHOW ZOOMED------#

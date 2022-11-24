@@ -53,7 +53,7 @@ from Programs.LipDetectie2 import *
 
 
 # ------face recognition------#
-
+from Programs.face_recog_test_mp import *
 # ------face recognition------#
 
 
@@ -111,11 +111,12 @@ while True:
         # None
     # ------LipDetection------#
 
-
-
     # ------FaceRecogntion------#
     if YAML_DATA['display_face_recognition'] == True:
-        None
+        print("Trying")
+        main_face_recogntion(img, YAML_DATA)
+        cv2.putText(img, "nice", (img.shape[1], img.shape[0] - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+        print("gerund")
     # ------FaceRecogntion------#
 
 
