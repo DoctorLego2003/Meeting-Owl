@@ -23,6 +23,13 @@ landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_land
 face_model = dlib.get_frontal_face_detector()
 landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 
+distancevorige = 0
+breedtemondvorige = 1
+zerocount = 0
+talklist = 0
+Talking = False
+
+
 # open YAML config file
 import yaml
 with open("MAIN_CONFIG", "r") as stream:
@@ -52,12 +59,19 @@ from Programs.BetterTracking import *
 # ------lip detection------#
 distancevorige = 0
 from Programs.LipDetection import *
+from Programs.LipDetectie2 import *
 # ------lip detection------#
 
 
 # ------face recognition------#
-
+from Programs.face_recog_test_mp import *
 # ------face recognition------#
+
+
+# ------HandGestures------#
+from Programs.gestures.HandGesture import *
+# ------HandGestures------#
+
 
 
 # ---------FPS------------#
@@ -100,19 +114,49 @@ while True:
         ptime = ptime_new
     # ---------FPS------------#
 
+
+
+
     # ------Tracking------#
     main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
     # ------Tracking------#
 
 
+
+
     # ------LipDetection------#
-    # if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
-    #     main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
+        # OLD
+        # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+        # NEW
+        # aaaaa, bbbbb, ccccc, ddddd, eeeee
+        distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
+        # None
+        # distancevorige = aaaaa
+        # breedtemondvorige = bbbbb
+        # zerocount = ccccc
+        # talklist = ddddd
+        # Talking = eeeee
     # ------LipDetection------#
 
-    cv2.imshow('test: ', img)
+
+    # # ------HandGestures------#
+    # if YAML_DATA['display_hand_gestures'] == True:
+    #     main_hand_gestures(img, YAML_DATA)
+    # # ------HandGestures------#
 
 
+    # # ------FaceRecogntion------#
+    # if YAML_DATA['display_face_recognition'] == True:
+    #     print("Trying")
+    #     main_face_recogntion(img, YAML_DATA)
+    #     cv2.putText(img, "nice", (img.shape[1], img.shape[0] - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+    #     print("gerund")
+    # # ------FaceRecogntion------#
+
+
+
+    cv2.imshow('Live: ', img)
 
 
     k = cv2.waitKey(30) & 0xff

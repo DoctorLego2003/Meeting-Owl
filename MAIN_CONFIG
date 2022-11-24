@@ -1,5 +1,6 @@
 # YAML installeren met "pip install pyyaml" in conda shit
 
+
 # ------SETUP------#
 # gewoon face_detection tonen op output
 display_face_detection: True
@@ -9,6 +10,8 @@ display_face_detection_zoomed: True
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
 display_lip_detection: True
+# display hand gestures
+display_hand_gestures: True
 # tonen van fps counter
 display_FPS: False
 # ------SETUP------#
@@ -17,9 +20,17 @@ display_FPS: False
 
 # ------CONSTANTEN------#
 # hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
-yawn_threshold: 35
 
-tracking_treshhold_low: 20
+
+# tracking
+tracking_treshhold_low: 10
 tracking_treshhold_high: 30
+
+# lip_detection
+yawn_threshold: 35
+relatief_verschil_waarde: 100
+zerocount_buffer_count: 10
+
+
 # ------CONSTANTEN------#
 

@@ -94,7 +94,7 @@ def main_lip_detection(frame, YAML_DATA, distancevorige, gray_img, face_model, l
         for (x, y, w, h) in gezicht:
             relatief_verschil = 100*verschil/w
             # print(relatief_verschil)
-            if relatief_verschil >= 1:
+            if relatief_verschil >= 5:
                 cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
         #cv2.putText(frame, lip_dist, (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
