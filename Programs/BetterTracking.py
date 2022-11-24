@@ -6,7 +6,7 @@ import numpy
 # zoomed = []
 # face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 # profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
-
+from imutils import face_utils
 # from .LipDetection import *
 from .gestures.HandGesture import *
 from .face_recog_test_mp import *
@@ -83,17 +83,16 @@ def intersection(a,b):
                 if check:
                     faces.append(face)
     return faces"""
-def detect_face_orientation():
-    img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_model(img_gray)
+def detect_face_orientation(img_gray, faces, landmark_model, face_utils):
+    import math
     heads = []
     for face in faces:
 
-
-        # ----------Detect Landmarks-----------#
         shapes = landmark_model(img_gray, face)
         shape = face_utils.shape_to_np(shapes)
         breedte = math.dist(shape[0], shape[16])
+        # ----------Detect Landmarks-----------#
+
         neus = shape[32]
         x = int(neus[0] - (breedte / 1.8))
         y = int(neus[1] - (1.3 * breedte))
@@ -160,7 +159,6 @@ def track(faces, zoomed):
         else:
             missing_index.append(i)
     # print('missing_index1:', missing_index)
-    if (len(new_faces) > 0) and (len(missing_index) > 0):
         # print('missing_index:', missing_index)
     #print('missing_index1:', missing_index)
     if (len(new_faces) > 0) and (len(missing_index) > 0):
@@ -244,7 +242,13 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 #     ret, img = cap.read()
 #     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #     #faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_model(img_gray)
+
+
+
+
+    faces = detect_face_orientation(img_gray, faces, landmark_model, face_utils)
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed)
     check_for_doubles(zoomed)

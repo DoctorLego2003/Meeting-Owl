@@ -2,6 +2,7 @@ import cv2
 import time
 import copy
 import dlib
+import math
 from scipy.spatial import distance as dist
 from imutils import face_utils
 
@@ -21,7 +22,7 @@ landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_land
 
 #--models voor dlib--
 face_model = dlib.get_frontal_face_detector()
-landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
+#landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 
 distancevorige = 0
 breedtemondvorige = 1
