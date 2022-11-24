@@ -64,6 +64,12 @@ from Programs.face_recog_test_mp import *
 # ------face recognition------#
 
 
+# ------HandGestures------#
+from Programs.gestures.HandGesture import *
+# ------HandGestures------#
+
+
+
 # ---------FPS------------#
 ptime = 0
 def display_FPS(ptime):
@@ -104,9 +110,14 @@ while True:
         ptime = ptime_new
     # ---------FPS------------#
 
+
+
+
     # ------Tracking------#
     main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
     # ------Tracking------#
+
+
 
 
     # ------LipDetection------#
@@ -122,21 +133,23 @@ while True:
         # zerocount = ccccc
         # talklist = ddddd
         # Talking = eeeee
-
-
-
-
-
-
     # ------LipDetection------#
 
-    # ------FaceRecogntion------#
-    if YAML_DATA['display_face_recognition'] == True:
-        print("Trying")
-        main_face_recogntion(img, YAML_DATA)
-        cv2.putText(img, "nice", (img.shape[1], img.shape[0] - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-        print("gerund")
-    # ------FaceRecogntion------#
+
+    # # ------HandGestures------#
+    # if YAML_DATA['display_hand_gestures'] == True:
+    #     main_hand_gestures(img, YAML_DATA)
+    # # ------HandGestures------#
+
+
+    # # ------FaceRecogntion------#
+    # if YAML_DATA['display_face_recognition'] == True:
+    #     print("Trying")
+    #     main_face_recogntion(img, YAML_DATA)
+    #     cv2.putText(img, "nice", (img.shape[1], img.shape[0] - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+    #     print("gerund")
+    # # ------FaceRecogntion------#
+
 
 
     cv2.imshow('Live: ', img)

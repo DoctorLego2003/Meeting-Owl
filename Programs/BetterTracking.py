@@ -7,7 +7,8 @@ import numpy
 # face_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_frontalface_default.xml')
 # profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
-from .LipDetection import *
+# from .LipDetection import *
+from .gestures.HandGesture import *
 from .face_recog_test_mp import *
 
 
@@ -256,8 +257,14 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
         if YAML_DATA['display_face_detection_zoomed'] == True:
             rec_gray = gray_img[y:y + h, x:x + w]
             rec_color = img[y:y + h, x:x + w]
-            htot = 3 * h // 2
-            wtot = 3 * w // 2
+            if YAML_DATA['display_hand_gestures'] == True:
+                htot = 5 * h // 2
+                wtot = 5 * w // 2
+            else:
+                htot = 3 * h // 2
+                wtot = 3 * w // 2
+            # htot = 3 * h // 2
+            # wtot = 3 * w // 2
             h2 = (htot - h) // 2
             w2 = (wtot - w) // 2
             if y < h2:
@@ -277,13 +284,21 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 zoomed[i][1] -= 1
 
             if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
-                head_frame = img[y - h2: y + h2 + h, x - w2: x + w2 + w]
-                head_frame = cv2.resize(head_frame, (400, 400))
 
+                # ------HandGestures------#
+                if YAML_DATA['display_hand_gestures'] == True:
+                    head_frame = img[y - h2: y + h2 + h, x - w2: x + w2 + w]
+                    head_frame = cv2.resize(head_frame, (400, 400))
+                    main_hand_gestures(head_frame, YAML_DATA)
+                else:
+                    head_frame = img[y - h2: y + h2 + h, x - w2: x + w2 + w]
+                    head_frame = cv2.resize(head_frame, (400, 400))
+
+                # ------HandGestures------#
 
                 # if YAML_DATA['display_lip_detection']:
                 #     main_lip_detection(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
-                # cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+                cv2.imshow('Zoom in ' + str(i + 1), head_frame)
 
             if zoomed[i][1] == 0:
                 if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
@@ -299,8 +314,12 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
             if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
                 [x, y, w, h] = zoomed[i][0]
-                htot = 3 * h // 2
-                wtot = 3 * w // 2
+                if YAML_DATA['display_hand_gestures'] == True:
+                    htot = 5 * h // 2
+                    wtot = 5 * w // 2
+                else:
+                    htot = 3 * h // 2
+                    wtot = 3 * w // 2
                 h2 = (htot - h) // 2
                 w2 = (wtot - w) // 2
                 if y < h2:

@@ -10,6 +10,8 @@ display_face_detection_zoomed: True
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
 display_lip_detection: True
+# display hand gestures
+display_hand_gestures: True
 # tonen van fps counter
 display_FPS: True
 # ------SETUP------#
