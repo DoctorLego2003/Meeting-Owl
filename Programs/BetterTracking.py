@@ -23,7 +23,7 @@ def intersection(a,b):
 def detect_face_orientation(gray_img, face_cascade, profile_cascade):
     faces = []
     front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
+    left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 3)
     gray_flipped = cv2.flip(gray_img, 1)
     """
     faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
@@ -34,7 +34,7 @@ def detect_face_orientation(gray_img, face_cascade, profile_cascade):
         print(w, x, new_x)
         faces[0][0] = new_x
     """
-    right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
+    right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 3)
 
     if type(front_faces) is not tuple:
         front_faces = front_faces.tolist()
@@ -98,7 +98,7 @@ def distance(point_one, point_two):
 def track(faces, zoomed):
     if len(zoomed) == 0:
         return faces
-    # print('zoomed: ', zoomed)
+    #print('zoomed: ', zoomed)
     dist = []
     for i in range(len(zoomed)):
         dist.append([])
@@ -146,6 +146,9 @@ def track(faces, zoomed):
     # print('missing_index1:', missing_index)
     if (len(new_faces) > 0) and (len(missing_index) > 0):
         # print('missing_index:', missing_index)
+    #print('missing_index1:', missing_index)
+    if (len(new_faces) > 0) and (len(missing_index) > 0):
+        #print('missing_index:', missing_index)
         for i in range(len(missing_index)):
             min_ind.append(missing_index[i])
             if i >= len(new_faces):
@@ -169,7 +172,6 @@ def track(faces, zoomed):
     # print('faces2:', faces)
     check_for_empty_faces(new_faces)
     # print('faces3:', faces)
-
     if len(zoomed) == len(new_faces):
         c = 0.8
         for i in range(len(zoomed)):
@@ -305,7 +307,6 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     cv2.destroyWindow('Zoom in ' + str(i + 1))
                 zoomed.remove(zoomed[i])
 
-
     for i in range(len(faces), len(zoomed)):
         if i >= len(zoomed):
             break
@@ -339,7 +340,6 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
         # cv2.imshow('Live: ', img)
-
 
 
 
