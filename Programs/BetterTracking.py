@@ -6,7 +6,7 @@ import numpy
 # profile_cascade = cv2.CascadeClassifier(r'./xml/haarcascade_profileface.xml')
 
 from .LipDetection import *
-
+ptime = 0
 
 def intersection(a,b):
   x = max(a[0], b[0])
@@ -16,12 +16,20 @@ def intersection(a,b):
   if w<0 or h<0: return False
   return True
 
-def detect_face_orientation(gray_img, face_cascade, profile_cascade):
+"""def detect_face_orientation(gray_img, face_cascade, profile_cascade):
+
+    ret, img = cam.read()
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    frame = cam.read()
+
+
+
+    
     faces = []
     front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 2)
     gray_flipped = cv2.flip(gray_img, 1)
-    """
+    
     faces = profile_cascade.detectMultiScale(gray_flipped, 1.3, 4)
     if len(faces) != 0:
         h, w = img.shape
@@ -29,8 +37,7 @@ def detect_face_orientation(gray_img, face_cascade, profile_cascade):
         new_x = h - x -1
         print(w, x, new_x)
         faces[0][0] = new_x
-    """
-    right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
+  right_profile = profile_cascade.detectMultiScale(gray_flipped, 1.3, 2)
 
     if type(front_faces) is not tuple:
         front_faces = front_faces.tolist()
@@ -71,8 +78,25 @@ def detect_face_orientation(gray_img, face_cascade, profile_cascade):
                         check = False
                 if check:
                     faces.append(face)
-    return faces
+    return faces"""
+def detect_face_orientation():
+    img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_model(img_gray)
+    heads = []
+    for face in faces:
 
+
+        # ----------Detect Landmarks-----------#
+        shapes = landmark_model(img_gray, face)
+        shape = face_utils.shape_to_np(shapes)
+        breedte = math.dist(shape[0], shape[16])
+        neus = shape[32]
+        x = int(neus[0] - (breedte / 1.8))
+        y = int(neus[1] - (1.3 * breedte))
+        w = int(breedte / 1.8 * 2)
+        h = int(breedte * 1.8)
+        heads.append([x, y, w, h])
+    return heads
 def distance(point_one, point_two):
     #print((point_one, point_two))
     if point_one == []:

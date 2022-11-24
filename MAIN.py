@@ -2,7 +2,8 @@ import cv2
 import time
 import copy
 import dlib
-
+from scipy.spatial import distance as dist
+from imutils import face_utils
 
 prev = []
 zoomed = []
@@ -18,6 +19,9 @@ profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xm
 face_model = dlib.get_frontal_face_detector()
 landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_landmarks.dat')
 
+#--models voor dlib--
+face_model = dlib.get_frontal_face_detector()
+landmark_model = dlib.shape_predictor('./dat/shape_predictor_68_face_landmarks.dat')
 
 # open YAML config file
 import yaml
@@ -72,7 +76,7 @@ def display_FPS(ptime):
 # -----MAIN------#
 
 try:
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     ret, img = cap.read()
     assert len(img) > 0
 except:

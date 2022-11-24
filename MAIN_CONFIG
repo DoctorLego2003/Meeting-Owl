@@ -10,7 +10,7 @@ display_face_recognition: False
 # lip overlay en "talking" indicator tonen
 display_lip_detection: True
 # tonen van fps counter
-display_FPS: True
+display_FPS: False
 # ------SETUP------#
 
 
