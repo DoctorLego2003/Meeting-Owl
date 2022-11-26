@@ -3,15 +3,15 @@
 
 # ------SETUP------#
 # gewoon face_detection tonen op output
-display_face_detection: True
+display_face_detection: False
 # zoomed in windows tonen als extra output
 display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
-display_lip_detection: False
+display_lip_detection: True
 # display hand gestures
-display_hand_gestures: False
+display_hand_gestures: True
 # tonen van fps counter
 display_FPS: True
 # ------SETUP------#
@@ -31,6 +31,9 @@ yawn_threshold: 35
 relatief_verschil_waarde: 100
 zerocount_buffer_count: 10
 
+# gestures
+extra_width: 1.5
+extra_height: 1.2
 
 # ------CONSTANTEN------#
 

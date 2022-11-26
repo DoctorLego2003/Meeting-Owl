@@ -268,8 +268,27 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             head_frame = cv2.resize(head_frame, (400, 400))
             # ------HandGestures------#
             if YAML_DATA['display_hand_gestures']:
-                main_hand_gestures(head_frame, YAML_DATA)
+                a = YAML_DATA['extra_width']
+                b = YAML_DATA['extra_height']
+                x_end = int(x + (1+a)*w)
+                y_end = int(y + (1+b)*h)
+                x_new = x - w
+                if x_end >= len(img[0]):
+                    x_end = len(img[0]) - 1
+                    x_new = min(len(img[0]) - int((2*a+1)*w), x_new)
+                if x_new < 0:
+                    x_new = 1
+                    if (2*a+1)*w < len(img[0]):
+                        x_end = int((2*a+1)*w)
+                    else:
+                        x_end = len(img[0])
+                if y_end > len(img):
+                    y_end = len(img) - 1
+                hand_frame = img[y:y_end, x_new:x_end]
+                main_hand_gestures(hand_frame, YAML_DATA)
+                cv2.imshow('Hands ' + str(i + 1), hand_frame)
             # ------HandGestures------#
+
             # ------LipDetection------#
             if YAML_DATA['display_lip_detection']:
                 gray_head_frame = cv2.cvtColor(head_frame, cv2.COLOR_BGR2GRAY)
