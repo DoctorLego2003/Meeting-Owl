@@ -213,7 +213,7 @@ def check_for_empty(zoomed):
 
 # while True:
 #img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model
-def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade):
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model):
 
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -272,7 +272,13 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------HandGestures------#
             # ------LipDetection------#
             if YAML_DATA['display_lip_detection']:
-                main_lip_detection2(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
+                gray_head_frame = cv2.cvtColor(head_frame, cv2.COLOR_BGR2GRAY)
+                if len(zoomed[i][2]) != 0:
+                    [distancevorige, breedtemondvorige, zerocount, talklist, Talking] = zoomed[i][2]
+                    distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(head_frame, YAML_DATA, gray_head_frame, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
+                else:
+                    distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(head_frame, YAML_DATA, gray_head_frame, face_model, landmark_model)
+                zoomed[i][2] = [distancevorige, breedtemondvorige, zerocount, talklist, Talking]
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
