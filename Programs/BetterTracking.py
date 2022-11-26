@@ -87,16 +87,14 @@ def detect_face_orientation(gray_img, face_cascade, profile_cascade):
     return faces
 
 def distance(point_one, point_two):
-    #print((point_one, point_two))
     if point_one == []:
         return float('inf')
     [x1, y1, w0, h0] = point_one
     [x2, y2, w1, h1] = point_two
     dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
-    #print(dist)
     return dist
 
-def track(faces, zoomed):
+def track(faces, zoomed, YAML_DATA):
     if len(zoomed) == 0:
         return faces
     #print('zoomed: ', zoomed)
@@ -112,7 +110,7 @@ def track(faces, zoomed):
         min_ind.append([])
         if len(dist[i]) != 0:
             mini = min(dist[i])
-            if mini <= 100:
+            if mini <= YAML_DATA['minimum_distance']:
                 counter = 0
                 for thing in dist[i]:
                     if thing == mini:
@@ -220,7 +218,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 #    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
     # print('faces:', faces, len(faces))
-    faces = track(faces, zoomed)
+    faces = track(faces, zoomed, YAML_DATA)
     #check_for_doubles(zoomed)
     #check_for_empty(zoomed)
     for i in range(len(faces)):
@@ -247,6 +245,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
         wtot = 3 * w // 2
         h2 = (htot - h) // 2
         w2 = (wtot - w) // 2
+        '''
         if y < h2:
             h2 = y
         if x + w2 + w > len(gray_img[0]):
@@ -255,6 +254,35 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             w2 = x
         if y + h + h2 > len(gray_img):
             h2 = len(gray_img) - y - h
+        '''
+        x_start = x - w2
+        y_start = y - h2
+        x_eind = x + w + w2
+        y_eind = y + h + h2
+        if x_start < 0:
+            if x_eind - x_start < len(img[0]):
+                x_eind = x_eind - x_start
+            else:
+                x_eind = len(img[0]) - 1
+            x_start = 0
+        if x_eind > len(img[0]):
+            if x_start + len(img[0]) - x_eind > 0:
+                x_start = x_start + len(img[0]) - x_eind
+            else:
+                x_start = 0
+            x_eind = len(img[0])
+        if y_start < 0:
+            if y_eind - y_start < len(img):
+                y_eind = y_eind - y_start
+            else:
+                y_eind = len(img) - 1
+            y_start = 0
+        if y_eind > len(img):
+            if y_start + len(img) - y_eind > 0:
+                y_start = y_start + len(img) - y_eind
+            else:
+                y_start = 0
+            y_eind = len(img)
 
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
             zoomed[i][0] = faces[i]
@@ -264,7 +292,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
 
         if (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
-            head_frame = img[y - h2: y + h2 + h, x - w2: x + w2 + w]
+            head_frame = img[y_start: y_eind, x_start: x_eind]
+
             head_frame = cv2.resize(head_frame, (400, 400))
             # ------HandGestures------#
             if YAML_DATA['display_hand_gestures']:
@@ -324,15 +353,35 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 wtot = 3 * w // 2
                 h2 = (htot - h) // 2
                 w2 = (wtot - w) // 2
-                if y < h2:
-                    h2 = y
-                if x + w2 + w > len(gray_img[0]):
-                    w2 = len(gray_img[0]) - w - x
-                if x < w2:
-                    w2 = x
-                if y + h + h2 > len(gray_img):
-                    h2 = len(gray_img) - y - h
-                head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                x_start = x - w2
+                y_start = y - h2
+                x_eind = x + w + w2
+                y_eind = y + h + h2
+                if x_start < 0:
+                    if x_eind - x_start < len(img[0]):
+                        x_eind = x_eind - x_start
+                    else:
+                        x_eind = len(img[0]) - 1
+                    x_start = 0
+                if x_eind > len(img[0]):
+                    if x_start + len(img[0]) - x_eind > 0:
+                        x_start = x_start + len(img[0]) - x_eind
+                    else:
+                        x_start = 0
+                    x_eind = len(img[0])
+                if y_start < 0:
+                    if y_eind - y_start < len(img):
+                        y_eind = y_eind - y_start
+                    else:
+                        y_eind = len(img) - 1
+                    y_start = 0
+                if y_eind > len(img):
+                    if y_start + len(img) - y_eind > 0:
+                        y_start = y_start + len(img) - y_eind
+                    else:
+                        y_start = 0
+                    y_eind = len(img)
+                head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
                     cv2.imshow('Zoom in ' + str(i + 1), head_frame)
             i += 1
