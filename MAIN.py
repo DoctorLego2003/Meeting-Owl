@@ -114,14 +114,15 @@ while True:
 
 
     # ------Tracking------#
-    main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
+    #main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
+    main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade)
     # ------Tracking------#
 
 
 
 
     # ------LipDetection------#
-    if YAML_DATA['display_lip_detection'] == True and YAML_DATA['display_face_detection_zoomed'] == False:
+    if YAML_DATA['display_lip_detection']:
         # OLD
         # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
         # NEW
