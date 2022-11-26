@@ -162,13 +162,13 @@ def track(faces, zoomed):
         for i in range(len(missing_index)):
             new_faces.append(faces[missing_index[i]])
         #print('new:', new_faces)
-    print('faces: ', faces)
-    print('new_faces: ', new_faces)
-    print('faces1:', faces)
+    #print('faces: ', faces)
+    #print('new_faces: ', new_faces)
+    #print('faces1:', faces)
     check_for_double_faces(new_faces)
-    print('faces2:', faces)
+    #print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    print('faces3:', faces)
+    #print('faces3:', faces)
     if len(zoomed) == len(new_faces):
         c = 0.8
         for i in range(len(zoomed)):
@@ -313,8 +313,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
     i = len(faces)
-    print('faces: ', faces)
-    print('zoomed: ', zoomed)
+    #print('faces: ', faces)
+    #print('zoomed: ', zoomed)
     while len(faces) <= i < len(zoomed):
         if zoomed[i][1] > 0:
             zoomed[i][1] -= 1
@@ -340,7 +340,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
-    print('zoomed:', zoomed)
+    #print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
 
