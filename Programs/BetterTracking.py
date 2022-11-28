@@ -166,12 +166,9 @@ def track(faces, zoomed, YAML_DATA):
     check_for_double_faces(new_faces)
     #print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    #print('faces3:', faces)
-    if len(zoomed) == len(new_faces):
-        c = 0.8
-        for i in range(len(zoomed)):
-            for j in range(4):
-                new_faces[i][j] = int(c * new_faces[i][j] + (1 - c) * zoomed[i][0][j])
+    #print('faces3:', new_faces)
+    #print('zoomed', zoomed)
+    #print('faces4:', new_faces)
     return new_faces
 
 def check_for_doubles(zoomed):
@@ -224,13 +221,13 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
             zoomed.append([[], 0, [], str()])
+
         (x, y, w, h) = faces[i]
 
         # -----SHOW RECTANGLE-----#
         if YAML_DATA['display_face_detection'] == True:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         # -----SHOW RECTANGLE-----#
-
         #     # ------FaceRecogntion------#
         #     if YAML_DATA['display_face_recognition'] == True:
         #         main_face_recogntion(img, YAML_DATA)
@@ -285,6 +282,14 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             y_eind = len(img)
 
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
+            c = 0.2
+            if len(zoomed[i][0]) == len(faces[i]) and len(faces[i]) != 0:
+                for j in range(4):
+                    number = c * faces[i][j] + (1 - c) * zoomed[i][0][j]
+                    if int(number) < int(number + 0.5):
+                        faces[i][j] = int(number + 1)
+                    else:
+                        faces[i][j] = int(number)
             zoomed[i][0] = faces[i]
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1
@@ -389,6 +394,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
+
+
     #print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
