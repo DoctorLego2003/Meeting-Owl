@@ -9,7 +9,7 @@ display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
-display_lip_detection: True
+display_lip_detection: False
 # display hand gestures
 display_hand_gestures: False
 # tonen van fps counter
@@ -31,6 +31,9 @@ yawn_threshold: 35
 relatief_verschil_waarde: 100
 zerocount_buffer_count: 10
 
+# gestures
+extra_width: 1.5
+extra_height: 1.2
 
 # ------CONSTANTEN------#
 

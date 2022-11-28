@@ -35,14 +35,14 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
 # ptime = 0
 # while True:
-def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking):
+def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige=0, breedtemondvorige=1, zerocount=0, talklist=0, Talking=False):
     # distancevorige = 0
     # breedtemondvorige = 1
     # zerocount = 0
     # talklist = 0
     # Talking = False
 
-    print("running")
+    #print("running")
 
     # yawn_tresh = YAML_DATA['yawn_threshold']
 
@@ -94,7 +94,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         #print("verschillip",verschillip)
         #print("verschilmond", verschilmond)
         relatief_verschil = verschillip*verschilmond*10
-        print(relatief_verschil)
+        #print(relatief_verschil)
 
 
         # if relatief_verschil >=10:
