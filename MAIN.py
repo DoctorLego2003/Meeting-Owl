@@ -102,47 +102,29 @@ while True:
     # print('faces:', faces, len(faces))
     # faces = track(faces, zoomed)
 
-
-
     # ---------FPS------------#
     if YAML_DATA['display_FPS'] == True:
         ptime_new = display_FPS(ptime)
         ptime = ptime_new
     # ---------FPS------------#
 
-
-
-
     # ------Tracking------#
     #main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
     main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
     # ------Tracking------#
-
-
-
 
     # ------LipDetection------#
     #if YAML_DATA['display_lip_detection']:
         # OLD
         # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
         # NEW
-        # aaaaa, bbbbb, ccccc, ddddd, eeeee
-
         #distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
-
-        # None
-        # distancevorige = aaaaa
-        # breedtemondvorige = bbbbb
-        # zerocount = ccccc
-        # talklist = ddddd
-        # Talking = eeeee
     # ------LipDetection------#
 
-
-    # # ------HandGestures------#
+    # ------HandGestures------#
     # if YAML_DATA['display_hand_gestures'] == True:
     #     main_hand_gestures(img, YAML_DATA)
-    # # ------HandGestures------#
+    # ------HandGestures------#
 
 
     # # ------FaceRecogntion------#

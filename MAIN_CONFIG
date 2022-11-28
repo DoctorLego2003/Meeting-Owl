@@ -9,7 +9,7 @@ display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
 display_face_recognition: False
 # lip overlay en "talking" indicator tonen
-display_lip_detection: False
+display_lip_detection: True
 # display hand gestures
 display_hand_gestures: False
 # tonen van fps counter
@@ -23,6 +23,7 @@ display_FPS: True
 
 
 # tracking
+minimum_distance: 100
 tracking_treshhold_low: 10
 tracking_treshhold_high: 30
 
