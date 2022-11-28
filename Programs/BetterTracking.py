@@ -314,8 +314,9 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 if y_end > len(img):
                     y_end = len(img) - 1
                 hand_frame = img[y:y_end, x_new:x_end]
-                zoomed[i][4] = main_hand_gestures(hand_frame, YAML_DATA)
-                if zoomed[i][4]:
+                gesture = main_hand_gestures(hand_frame, YAML_DATA)
+                if gesture != None:
+                    zoomed[i][4] = gesture
 
                 #cv2.imshow('Hand ' + str(i+1), hand_frame)
                 # ------HandGestures------#
@@ -333,7 +334,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
-                if Talking and Waiting:
+                if Talking and zoomed[i][4]:
                     if len(zoomed[i][3]) == 0:
                         cv2.imshow('Zoom in ' + str(i + 1), head_frame)
                     else:
