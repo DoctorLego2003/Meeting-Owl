@@ -114,11 +114,11 @@ while True:
     # ------Tracking------#
 
     # ------LipDetection------#
-    #if YAML_DATA['display_lip_detection']:
+    if YAML_DATA['display_lip_detection']:
         # OLD
         # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
         # NEW
-        #distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
+        distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
     # ------LipDetection------#
 
     # ------HandGestures------#

@@ -182,6 +182,7 @@ def check_for_doubles(zoomed):
                 zoomed.remove(zoomed[j])
             else:
                 j += 1
+
 def check_for_double_faces(faces):
     i = 0
     while i < len(faces):
@@ -231,12 +232,12 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
         # -----SHOW RECTANGLE-----#
 
-        #     # ------FaceRecogntion------#
-        #     if YAML_DATA['display_face_recognition'] == True:
-        #         main_face_recogntion(img, YAML_DATA)
-        #         cv2.putText(img, "69 nice", (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-        #
-        # # ------FaceRecogntion------#
+
+        # ------FaceRecogntion------#
+        if YAML_DATA['display_face_recognition'] == True:
+            main_face_recogntion(img, YAML_DATA)
+            cv2.putText(img, "69 nice", (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+        # ------FaceRecogntion------#
 
         # ------SHOW ZOOMED------#
         #rec_gray = gray_img[y:y + h, x:x + w]
@@ -295,6 +296,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             head_frame = img[y_start: y_eind, x_start: x_eind]
 
             head_frame = cv2.resize(head_frame, (400, 400))
+
+
             # ------HandGestures------#
             if YAML_DATA['display_hand_gestures']:
                 a = YAML_DATA['extra_width']
@@ -328,6 +331,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(head_frame, YAML_DATA, gray_head_frame, face_model, landmark_model)
                 zoomed[i][2] = [distancevorige, breedtemondvorige, zerocount, talklist, Talking]
             # ------LipDetection------#
+
+
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
                 if len(zoomed[i][3]) == 0:
