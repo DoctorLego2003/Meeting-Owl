@@ -10,7 +10,7 @@ import time
 
 
 # while True:
-def main_hand_gestures(img, YAML_DATA):
+def main_hand_gestures(hand_img, YAML_DATA):
     medhands = mediapipe.solutions.hands
     hands = medhands.Hands(max_num_hands=1, min_detection_confidence=0.7)
     draw = mediapipe.solutions.drawing_utils
@@ -19,20 +19,21 @@ def main_hand_gestures(img, YAML_DATA):
 
     # success, img = cap.read()
     # img = cv2.flip(img, 1)
-    imgrgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    res = hands.process(imgrgb)
+    #imgrgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    #res = hands.process(imgrgb)
+    res = hands.process(hand_img)
 
     lmlist = []
     tipids = [4, 8, 12, 16, 20]  # list of all landmarks of the tips of fingers
 
-    cv2.rectangle(img, (20, 350), (90, 440), (0, 255, 204), cv2.FILLED)
-    cv2.rectangle(img, (20, 350), (90, 440), (0, 0, 0), 5)
+    cv2.rectangle(hand_img, (20, 350), (90, 440), (0, 255, 204), cv2.FILLED)
+    cv2.rectangle(hand_img, (20, 350), (90, 440), (0, 0, 0), 5)
 
     if res.multi_hand_landmarks:
         for handlms in res.multi_hand_landmarks:
             for id, lm in enumerate(handlms.landmark):
 
-                h, w, c = img.shape
+                h, w, c = hand_img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 lmlist.append([id, cx, cy])
                 if len(lmlist) != 0 and len(lmlist) == 21:
@@ -60,10 +61,10 @@ def main_hand_gestures(img, YAML_DATA):
                     if len(fingerlist) != 0:
                         fingercount = fingerlist.count(1)
 
-                    cv2.putText(img, str(fingercount), (25, 430), cv2.FONT_HERSHEY_PLAIN, 6, (0, 0, 0), 5)
+                    cv2.putText(hand_img, str(fingercount), (25, 430), cv2.FONT_HERSHEY_PLAIN, 6, (0, 0, 0), 5)
 
                 # change color of points and lines
-                draw.draw_landmarks(img, handlms, medhands.HAND_CONNECTIONS,
+                draw.draw_landmarks(hand_img, handlms, medhands.HAND_CONNECTIONS,
                                     draw.DrawingSpec(color=(0, 255, 204), thickness=2, circle_radius=2),
                                     draw.DrawingSpec(color=(0, 0, 0), thickness=2, circle_radius=3))
 
