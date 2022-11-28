@@ -144,7 +144,7 @@ def track(faces, zoomed):
         else:
             missing_index.append(i)
     # print('missing_index1:', missing_index)
-    if (len(new_faces) > 0) and (len(missing_index) > 0):
+    # if (len(new_faces) > 0) and (len(missing_index) > 0):
         # print('missing_index:', missing_index)
     #print('missing_index1:', missing_index)
     if (len(new_faces) > 0) and (len(missing_index) > 0):
@@ -299,7 +299,6 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 # ------HandGestures------#
 
                 # if YAML_DATA['display_lip_detection']:
-                #     main_lip_detection(head_frame, YAML_DATA, distancevorige, head_frame, face_model, landmark_model, face_cascade)
                 cv2.imshow('Zoom in ' + str(i + 1), head_frame)
 
             if zoomed[i][1] == 0:
@@ -332,6 +331,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 if y + h + h2 > len(gray_img):
                     h2 = len(gray_img) - y - h
                 head_frame = cv2.resize(img[y - h2: y + h2 + h, x - w2: x + w2 + w], (400, 400))
+                # if Talking == True:
                 cv2.imshow('Zoom in ' + str(i + 1), head_frame)
         # print('zoomed:', zoomed)
         if zoomed[i][1] == 0:
