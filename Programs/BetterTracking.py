@@ -211,7 +211,7 @@ def check_for_empty(zoomed):
 
 # while True:
 #img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model
-def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model):
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, counterpounter =0):
 
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -223,7 +223,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     #check_for_empty(zoomed)
     for i in range(len(faces)):
         if len(faces) > len(zoomed):
-            zoomed.append([[], 0, [], str()])
+            zoomed.append([[], 0, [], str(), False])
         (x, y, w, h) = faces[i]
 
         # -----SHOW RECTANGLE-----#
@@ -314,19 +314,14 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 if y_end > len(img):
                     y_end = len(img) - 1
                 hand_frame = img[y:y_end, x_new:x_end]
-                fingercount = main_hand_gestures(hand_frame, YAML_DATA)
-                if fingercount != None:
-                    if fingercount <= 2:
-                        if len(zoomed[i][3]) == 0:
-                            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-                        else:
-                            cv2.imshow('Zoom in ' + zoomed[i][3], head_frame)
-                    elif fingercount >= 4:
-                        if not cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) < 1:
-                            cv2.destroyWindow('Zoom in ' + str(i + 1))
+                zoomed[i][4] = main_hand_gestures(hand_frame, YAML_DATA)
+                if zoomed[i][4]:
+
+                #cv2.imshow('Hand ' + str(i+1), hand_frame)
                 # ------HandGestures------#
 
             # ------LipDetection------#
+            Talking = False
             if YAML_DATA['display_lip_detection']:
                 gray_head_frame = cv2.cvtColor(head_frame, cv2.COLOR_BGR2GRAY)
                 if len(zoomed[i][2]) != 0:
@@ -338,7 +333,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
-                if Talking:
+                if Talking and Waiting:
                     if len(zoomed[i][3]) == 0:
                         cv2.imshow('Zoom in ' + str(i + 1), head_frame)
                     else:
