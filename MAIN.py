@@ -86,11 +86,11 @@ def display_FPS(ptime):
 # -----MAIN------#
 
 try:
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     ret, img = cap.read()
     assert len(img) > 0
 except:
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
 # cap= cv2.VideoCapture('Programs/test_footage/IMG_8235.mp4')
 
