@@ -283,7 +283,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             y_eind = len(img)
 
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
-            c = 0.2
+            c = 0.05
             if len(zoomed[i][0]) == len(faces[i]) and len(faces[i]) != 0:
                 for j in range(4):
                     number = c * faces[i][j] + (1 - c) * zoomed[i][0][j]
@@ -291,6 +291,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         faces[i][j] = int(number + 1)
                     else:
                         faces[i][j] = int(number)
+            #cv2.imshow('faces' + str(i+1), faces[i])
             zoomed[i][0] = faces[i]
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1
@@ -340,7 +341,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
-                if Talking and zoomed[i][4]:
+                if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
                     if len(zoomed[i][3]) == 0:
                         cv2.imshow('Zoom in ' + str(i + 1), head_frame)
                     else:
@@ -357,8 +358,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
     i = len(faces)
-    #print('faces: ', faces)
-    #print('zoomed: ', zoomed)
+    print('faces: ', faces)
+    print('zoomed: ', zoomed)
     while len(faces) <= i < len(zoomed):
         if zoomed[i][1] > 0:
             zoomed[i][1] -= 1
@@ -406,7 +407,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
 
-    #print('zoomed:', zoomed)
+    print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
 

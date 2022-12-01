@@ -72,10 +72,11 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         # ----------Detect Landmarks-----------#
         shapes = landmark_model(img_gray, face)
         shape = face_utils.shape_to_np(shapes)
-
+        #print(shapes)
+        #print(shape)
         # -------Detecting/Marking the lower and upper lip--------#
-        #lip = shape[48:60]
-        #cv2.drawContours(frame, [lip], -1, (0, 165, 255), thickness=3)
+        lip = shape[48:60]
+        cv2.drawContours(frame, [lip], -1, (0, 165, 255), thickness=3)
 
 
         # -------Calculating the lip distance-----#
