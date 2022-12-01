@@ -11,7 +11,7 @@ display_face_recognition: False
 # lip overlay en "talking" indicator tonen
 display_lip_detection: True
 # display hand gestures
-display_hand_gestures: False
+display_hand_gestures: True
 # tonen van fps counter
 display_FPS: True
 # ------SETUP------#
@@ -35,6 +35,5 @@ zerocount_buffer_count: 10
 # gestures
 extra_width: 1.5
 extra_height: 1.2
-
 # ------CONSTANTEN------#
 
