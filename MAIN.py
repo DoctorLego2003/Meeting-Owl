@@ -111,6 +111,7 @@ while True:
     # ------Tracking------#
     #main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
     main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+    print(zoomed)
     # ------Tracking------#
 
     # ------LipDetection------#
