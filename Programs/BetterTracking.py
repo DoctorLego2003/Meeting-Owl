@@ -399,7 +399,14 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     y_eind = len(img)
                 head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
-                    cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+                    if (zoomed[i][2][4] or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                        if len(zoomed[i][3]) == 0:
+                            cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+                        else:
+                            cv2.imshow('Zoom in ' + zoomed[i][3], head_frame)
+                    else:
+                        if not cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) < 1:
+                            cv2.destroyWindow('Zoom in ' + str(i + 1))
             i += 1
         elif zoomed[i][1] == 0:
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:

@@ -66,6 +66,10 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
     # img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     img_gray = gray_img
     faces = face_model(img_gray)
+    if len(faces) == 0:
+        if zerocount != 0:
+            Talking = False
+        return distancevorige, breedtemondvorige, zerocount, talklist, Talking
     for face in faces:
 
 
@@ -75,12 +79,11 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         #print(shapes)
         #print(shape)
         # -------Detecting/Marking the lower and upper lip--------#
-        lip = shape[48:60]
-        cv2.drawContours(frame, [lip], -1, (0, 165, 255), thickness=3)
+        #lip = shape[48:60]
+        #cv2.drawContours(frame, [lip], -1, (0, 165, 255), thickness=3)
 
 
         # -------Calculating the lip distance-----#
-
         lip_dist, distancevorige, breedtemond, breedtemondvorige = (cal_yawn(shape, distancevorige, breedtemondvorige))
         lip_dist = int(lip_dist)
         breedtemond = int(breedtemond)
@@ -99,6 +102,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
 
 
         # if relatief_verschil >=10:
+
         if relatief_verschil >= YAML_DATA['relatief_verschil_waarde']:
             talklist += 1
             #print(talklist)
@@ -126,6 +130,8 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 200, 0), 2)
             #print("Not talking")
 
+        if distancevorige == lip_dist and breedtemondvorige == breedtemond:
+            Talking = False
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 
