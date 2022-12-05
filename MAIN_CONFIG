@@ -23,9 +23,9 @@ display_FPS: True
 
 
 # tracking
-minimum_distance: 100
-tracking_treshhold_low: 10
-tracking_treshhold_high: 30
+minimum_distance: 500
+tracking_treshhold_low: 15
+tracking_treshhold_high: 50
 
 # lip_detection
 yawn_threshold: 35
