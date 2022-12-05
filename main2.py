@@ -121,6 +121,7 @@ def face_reco(connectie, event, lock, stream):
         # rgb_frame = frame[:, :, ::-1]
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_locations = face_recognition.face_locations(rgb_frame)
+        print(face_locations)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
         connectie.send(zip(face_locations, face_encodings))
@@ -158,9 +159,9 @@ def MAIN(YAML_DATA, ptime):
         lock.release()
         if not event.is_set():
             face_data = list(face_data_reciever.recv())
-            print(face_data)
+            # print(face_data)
             event.set()
-            print("heeft facedetectie gedaan")
+            # print("heeft facedetectie gedaan")
             # for data in face_data:
             #     print(data)
             #     face_encodings.append(list(data[1]))
@@ -183,7 +184,7 @@ def MAIN(YAML_DATA, ptime):
 
         face_names = []
         for i, face_location in enumerate(face_data):
-            print(face_location)
+            # print(face_location)
             (x, y, w, h) = face_location
 
             # HIER WORDEN MATCHES VERGELEKEN MET ELKAAR
