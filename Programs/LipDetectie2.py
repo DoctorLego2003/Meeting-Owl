@@ -35,7 +35,7 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
 # ptime = 0
 # while True:
-def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige=0, breedtemondvorige=1, zerocount=0, talklist=0, Talking=False):
+def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, distancevorige=0, breedtemondvorige=1, zerocount=0, talklist=0, Talking=False, counter = 0):
     # distancevorige = 0
     # breedtemondvorige = 1
     # zerocount = 0
@@ -67,9 +67,11 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
     img_gray = gray_img
     faces = face_model(img_gray)
     if len(faces) == 0:
-        if zerocount != 0:
+        counter += 1
+        if counter > 20:
             Talking = False
-        return distancevorige, breedtemondvorige, zerocount, talklist, Talking
+            counter = 0
+        return distancevorige, breedtemondvorige, zerocount, talklist, Talking, counter
     for face in faces:
 
 
@@ -135,7 +137,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 
-    return distancevorige, breedtemondvorige, zerocount, talklist, Talking
+    return distancevorige, breedtemondvorige, zerocount, talklist, Talking, counter
 
     # cv2.imshow('Webcam', frame)
     # if cv2.waitKey(1) & 0xFF == ord('q'):
