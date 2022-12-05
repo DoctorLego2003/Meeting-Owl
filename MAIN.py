@@ -112,6 +112,7 @@ def capture_vid(streamer):
             streamer.send(img)
 
 def face_reco(connectie, event, lock, stream, YAML_DATA, zoomed):
+    print("face_reco")
     # xml files
     face_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_frontalface_default.xml')
     profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xml')
@@ -130,21 +131,23 @@ def face_reco(connectie, event, lock, stream, YAML_DATA, zoomed):
         # print("face_reco")
         # rgb_frame = frame[:, :, ::-1]
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # face_locations = face_recognition.face_locations(rgb_frame)
+        face_locations = face_recognition.face_locations(rgb_frame)
+        face_locations2 = face_locations
         # print(face_locations)
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # print("zoomed", zoomed_coords)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
-        for persoon in zoomed:
-            # print("personen", persoon)
-            zoomed_coords.append(tuple(persoon[0]))
-            # print("zoomed2", zoomed_coords)
 
-        face_locations2 = zoomed_coords
-        # print("facelocations", face_locations)  # in (x1, y1, x2, y2)
-        # print("facelocations2", face_locations2)  # in (x, y, w, h)
-        # (x, y, w, h) = face_locations2[0]
-        face_locations2 = [(y, h + x, w + y, x) for (x,y,w,h) in face_locations2]
+        # main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+        # for persoon in zoomed:
+        #     # print("personen", persoon)
+        #     zoomed_coords.append(tuple(persoon[0]))
+        #     # print("zoomed2", zoomed_coords)
+        #
+        # face_locations2 = zoomed_coords
+        # # print("facelocations", face_locations)  # in (x1, y1, x2, y2)
+        # # print("facelocations2", face_locations2)  # in (x, y, w, h)
+        # # (x, y, w, h) = face_locations2[0]
+        # face_locations2 = [(y, h + x, w + y, x) for (x,y,w,h) in face_locations2]
 
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations2)
 
@@ -181,6 +184,13 @@ def MAIN(YAML_DATA, ptime):
         lock.acquire()
         frame = stream.recv()
         lock.release()
+
+
+        gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+
+
+
         if not event.is_set():
             face_data = list(face_data_reciever.recv())
             # print(face_data)
@@ -198,13 +208,13 @@ def MAIN(YAML_DATA, ptime):
 
             face_encodings = [data[1] for data in face_data]
             face_data = [data[0] for data in face_data]
-            print("1", face_data)
+            # print("1", face_data)
             # print(face_data)
 
             # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
 
             face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
-            print("2", face_data)
+            # print("2", face_data)
             # print(face_data)q
 
         face_names = []
