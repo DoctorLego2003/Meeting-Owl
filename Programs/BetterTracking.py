@@ -12,6 +12,8 @@ from .gestures.HandGesture import *
 from .face_recog_test_mp import *
 from .LipDetectie2 import *
 
+from .Organising import *
+
 
 def intersection(a,b):
   x = max(a[0], b[0])
@@ -219,6 +221,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed, YAML_DATA)
+    show = []
     #check_for_doubles(zoomed)
     #check_for_empty(zoomed)
     for i in range(len(faces)):
@@ -335,21 +338,12 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
                 if Talking and zoomed[i][4]:
-                    if len(zoomed[i][3]) == 0:
-                        cv2.imshow('Zoom in ' + str(i + 1), head_frame)
-                    else:
-                        cv2.imshow('Zoom in ' + zoomed[i][3], head_frame)
-                else:
-                    if not cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) < 1:
-                        cv2.destroyWindow('Zoom in ' + str(i + 1))
+                    show.append(head_frame)
+                elif not YAML_DATA['display_lip_detection'] and not YAML_DATA['display_hand_gestures']:
+                    show.append(head_frame)
 
+            #organise(show)
             # -----DisplayZoomed------#
-
-        if zoomed[i][1] == 0:
-            if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
-                cv2.destroyWindow('Zoom in ' + str(i + 1))
-            zoomed.remove(zoomed[i])
-
     i = len(faces)
     #print('faces: ', faces)
     #print('zoomed: ', zoomed)
@@ -392,12 +386,15 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     y_eind = len(img)
                 head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
-                    cv2.imshow('Zoom in ' + str(i + 1), head_frame)
+                    show.append(head_frame)
             i += 1
         elif zoomed[i][1] == 0:
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
+    print(show)
+    organise(show)
+
     #print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
