@@ -111,47 +111,20 @@ def capture_vid(streamer):
         if ret:
             streamer.send(img)
 
-def face_reco(connectie, event, lock, stream, YAML_DATA, zoomed):
-    print("face_reco")
-    # xml files
-    face_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_frontalface_default.xml')
-    profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xml')
-
-    # face shit voor lip detection
-    face_model = dlib.get_frontal_face_detector()
-    landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_landmarks.dat')
-
+def face_reco(connectie, event, lock, stream):
     while True:
         lock.acquire()
         frame = stream.recv()
         lock.release()
 
-        zoomed_coords = []
-
         # print("face_reco")
         # rgb_frame = frame[:, :, ::-1]
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_locations = face_recognition.face_locations(rgb_frame)
-        face_locations2 = face_locations
-        # print(face_locations)
-        gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # print("zoomed", zoomed_coords)
+        print(face_locations)
+        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-        # main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
-        # for persoon in zoomed:
-        #     # print("personen", persoon)
-        #     zoomed_coords.append(tuple(persoon[0]))
-        #     # print("zoomed2", zoomed_coords)
-        #
-        # face_locations2 = zoomed_coords
-        # # print("facelocations", face_locations)  # in (x1, y1, x2, y2)
-        # # print("facelocations2", face_locations2)  # in (x, y, w, h)
-        # # (x, y, w, h) = face_locations2[0]
-        # face_locations2 = [(y, h + x, w + y, x) for (x,y,w,h) in face_locations2]
-
-        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations2)
-
-        connectie.send(zip(face_locations2, face_encodings))
+        connectie.send(zip(face_locations, face_encodings))
         event.clear()
         event.wait()
 
@@ -169,7 +142,7 @@ def MAIN(YAML_DATA, ptime):
     event = multiprocessing.Event()
     event.set()
     face_data_reciever, face_data_sender = multiprocessing.Pipe()
-    proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, YAML_DATA, zoomed, ))
+    proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream,))
     proces.start()
 
     # lock.acquire()
@@ -184,13 +157,6 @@ def MAIN(YAML_DATA, ptime):
         lock.acquire()
         frame = stream.recv()
         lock.release()
-
-
-        gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
-
-
-
         if not event.is_set():
             face_data = list(face_data_reciever.recv())
             # print(face_data)
@@ -208,13 +174,12 @@ def MAIN(YAML_DATA, ptime):
 
             face_encodings = [data[1] for data in face_data]
             face_data = [data[0] for data in face_data]
-            # print("1", face_data)
             # print(face_data)
 
             # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
 
             face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
-            # print("2", face_data)
+
             # print(face_data)q
 
         face_names = []
@@ -244,10 +209,46 @@ def MAIN(YAML_DATA, ptime):
         # ---------FPS------------#
 
 
-        # ------Tracking------#
-        # main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
-        # main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
-        # ------Tracking------#
+        # # ------Tracking------#
+        # #main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model)
+        # # main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+        # # ------Tracking------#
+        #
+        #
+        #
+        #
+        # # ------LipDetection------#
+        # if YAML_DATA['display_lip_detection']:
+        #     # OLD
+        #     # main_lip_detection(img, YAML_DATA, distancevorige, gray_img, face_model, landmark_model, face_cascade)
+        #     # NEW
+        #     # aaaaa, bbbbb, ccccc, ddddd, eeeee
+        #
+        #     distancevorige, breedtemondvorige, zerocount, talklist, Talking = main_lip_detection2(img, YAML_DATA, gray_img, face_model, landmark_model, distancevorige, breedtemondvorige, zerocount, talklist, Talking)
+        #
+        #     # None
+        #     # distancevorige = aaaaa
+        #     # breedtemondvorige = bbbbb
+        #     # zerocount = ccccc
+        #     # talklist = ddddd
+        #     # Talking = eeeee
+        # # ------LipDetection------#
+
+
+        # # ------HandGestures------#
+        # if YAML_DATA['display_hand_gestures'] == True:
+        #     main_hand_gestures(img, YAML_DATA)
+        # # ------HandGestures------#
+
+
+        # # ------FaceRecogntion------#
+        # if YAML_DATA['display_face_recognition'] == True:
+        #     print("Trying")
+        #     main_face_recogntion(img, YAML_DATA)
+        #     cv2.putText(img, "nice", (img.shape[1], img.shape[0] - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+        #     print("gerund")
+        # # ------FaceRecogntion------#
+
 
 
         cv2.imshow('Live: ', frame)
