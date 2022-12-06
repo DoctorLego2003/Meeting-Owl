@@ -87,6 +87,7 @@ def display_FPS(ptime):
 
 try:
     cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture('C:/Users/arnel/OneDrive/Documents/Burgi/Semester 3/Peno/Tests/Tracking/Hoofdtrack_test_3.mp4')
     ret, img = cap.read()
     assert len(img) > 0
 except:
