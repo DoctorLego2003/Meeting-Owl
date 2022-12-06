@@ -111,46 +111,40 @@ def capture_vid(streamer):
         if ret:
             streamer.send(img)
 
-def face_reco(connectie, event, lock, stream, YAML_DATA, zoomed):
-    print("face_reco")
-    # xml files
-    face_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_frontalface_default.xml')
-    profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xml')
-
-    # face shit voor lip detection
-    face_model = dlib.get_frontal_face_detector()
-    landmark_model = dlib.shape_predictor('Programs/dat/shape_predictor_68_face_landmarks.dat')
-
+def face_reco(connectie, event, lock, stream):
     while True:
         lock.acquire()
         frame = stream.recv()
         lock.release()
+
+        print("face_recog loop")
 
         zoomed_coords = []
 
         # print("face_reco")
         # rgb_frame = frame[:, :, ::-1]
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        face_locations = face_recognition.face_locations(rgb_frame)
-        face_locations2 = face_locations
+        # face_locations = face_recognition.face_locations(rgb_frame)
+        # face_locations2 = face_locations
         # print(face_locations)
-        gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # print("zoomed", zoomed_coords)
-
+        print(zoomed)
         # main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
-        # for persoon in zoomed:
-        #     # print("personen", persoon)
-        #     zoomed_coords.append(tuple(persoon[0]))
-        #     # print("zoomed2", zoomed_coords)
-        #
-        # face_locations2 = zoomed_coords
-        # # print("facelocations", face_locations)  # in (x1, y1, x2, y2)
-        # # print("facelocations2", face_locations2)  # in (x, y, w, h)
-        # # (x, y, w, h) = face_locations2[0]
-        # face_locations2 = [(y, h + x, w + y, x) for (x,y,w,h) in face_locations2]
+        for persoon in zoomed:
+            # print("personen", persoon)
+            zoomed_coords.append(tuple(persoon[0]))
+            # print("zoomed2", zoomed_coords)
+
+        face_locations2 = zoomed_coords
+        # print("facelocations", face_locations)  # in (x1, y1, x2, y2)
+        # print("facelocations2", face_locations2)  # in (x, y, w, h)
+        # (x, y, w, h) = face_locations2[0]
+        face_locations2 = [(y, h + x, w + y, x) for (x,y,w,h) in face_locations2]
 
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations2)
 
+        print("1", face_locations2, face_encodings)
         connectie.send(zip(face_locations2, face_encodings))
         event.clear()
         event.wait()
@@ -168,9 +162,11 @@ def MAIN(YAML_DATA, ptime):
     lock = multiprocessing.RLock()
     event = multiprocessing.Event()
     event.set()
-    face_data_reciever, face_data_sender = multiprocessing.Pipe()
-    proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, YAML_DATA, zoomed, ))
-    proces.start()
+
+    if YAML_DATA['display_face_recognition'] == True:
+        face_data_reciever, face_data_sender = multiprocessing.Pipe()
+        proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, ))
+        proces.start()
 
     # lock.acquire()
     # frame = stream.recv()
@@ -179,61 +175,66 @@ def MAIN(YAML_DATA, ptime):
 
     face_data = []
 
-
+    # MAIN TRUE LOOP VAN HET PROGRAMMA
     while True:
         lock.acquire()
         frame = stream.recv()
         lock.release()
 
 
+        # ------TRACKING------#
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+        # ------TRACKING------#
 
 
+        if YAML_DATA['display_face_recognition'] == True:
 
-        if not event.is_set():
-            face_data = list(face_data_reciever.recv())
-            # print(face_data)
-            event.set()
-            # print("heeft facedetectie gedaan")
-            # for data in face_data:
-            #     print(data)
-            #     face_encodings.append(list(data[1]))
-            #     face_locations.append(list(data[0]))
-                # face_data = [data[0] for data in face_data]
+            if not event.is_set():
+                face_data = list(face_data_reciever.recv())
+                # print(face_data)
+                event.set()
+                # print("heeft facedetectie gedaan")
+                # for data in face_data:
+                #     print(data)
+                #     face_encodings.append(list(data[1]))
+                #     face_locations.append(list(data[0]))
+                    # face_data = [data[0] for data in face_data]
+                    # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
+
+                # print(face_encodings)
+                # print(face_locations)
+
+                face_encodings = [data[1] for data in face_data]
+                face_data = [data[0] for data in face_data]
+                print(face_locations, face_data)
+                # print("1", face_data)
+                # print(face_data)
+
                 # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
 
-            # print(face_encodings)
-            # print(face_locations)
+                face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
+                # print("2", face_data)
+                # print(face_data)q
 
-            face_encodings = [data[1] for data in face_data]
-            face_data = [data[0] for data in face_data]
-            # print("1", face_data)
-            # print(face_data)
+            face_names = []
+            for i, face_location in enumerate(face_data):
+                # print(face_location)
+                (x, y, w, h) = face_location
 
-            # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
+                # HIER WORDEN MATCHES VERGELEKEN MET ELKAAR
+                matches = face_recognition.compare_faces(known_face_encodings, face_encodings[i])
+                name = "Unknown"
+                # print(matches)
 
-            face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
-            # print("2", face_data)
-            # print(face_data)q
-
-        face_names = []
-        for i, face_location in enumerate(face_data):
-            # print(face_location)
-            (x, y, w, h) = face_location
-
-            # HIER WORDEN MATCHES VERGELEKEN MET ELKAAR
-            matches = face_recognition.compare_faces(known_face_encodings, face_encodings[i])
-            name = "Unknown"
-            # print(matches)
-
-            if True in matches:
-                first_match_index = matches.index(True)
-                name = known_face_names[first_match_index]
+                if True in matches:
+                    first_match_index = matches.index(True)
+                    name = known_face_names[first_match_index]
 
 
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
-            cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
+                cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+
 
 
         # ---------FPS------------#
