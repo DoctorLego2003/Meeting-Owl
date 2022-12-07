@@ -304,7 +304,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1
-        elif zoomed[i][1] >= 0:
+        elif zoomed[i][1] > 0:
             zoomed[i][1] -= 1
         zoomed[i][0] = faces[i]
         if zoomed[i][1] == 0:
@@ -354,6 +354,10 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
                 if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                    if len(zoomed[i][3]) == 0:
+                        cv2.putText(head_frame, str(i + 1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    else:
+                        cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                     show.append(head_frame)
                 #elif not YAML_DATA['display_lip_detection'] and not YAML_DATA['display_hand_gestures']:
                 #    show.append(head_frame)
@@ -410,6 +414,10 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         if not zoomed[i][4]:
                             Gest = False
                     if Talk and Gest:
+                        if len(zoomed[i][3]) == 0:
+                            cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                        else:
+                            cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                         show.append(head_frame)
                         #if len(zoomed[i][3]) == 0:
                             #cv2.imshow('Zoom in ' + str(i + 1), head_frame)
