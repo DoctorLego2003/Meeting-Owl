@@ -185,15 +185,15 @@ def MAIN(YAML_DATA, ptime):
     event = multiprocessing.Event()
     event.set()
 
-    testevent = multiprocessing.Event()
-    testevent.set()
+    # testevent = multiprocessing.Event()
+    # testevent.set()
 
 
 
 
 
     # test
-    testconn1reciever, testconn2sender = multiprocessing.Pipe()
+    # testconn1reciever, testconn2sender = multiprocessing.Pipe()
 
 
 
@@ -224,12 +224,12 @@ def MAIN(YAML_DATA, ptime):
 
         # ------TRACKING------#
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, testconn2sender)
+        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model) # +testconn2sender
         # ------TRACKING------#
 
         # zoomed has been changed
 
-        testconn2sender.send(zoomed)
+        # testconn2sender.send(zoomed)
 
 
 
