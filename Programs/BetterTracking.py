@@ -248,7 +248,6 @@ def make_frame(img, face):
 # while True:
 #img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model
 def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model): #+ testconn2sender
-
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
