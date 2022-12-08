@@ -219,7 +219,7 @@ def MAIN(YAML_DATA, ptime):
         frame = stream.recv()
         lock.release()
 
-        print("zoomed in main file", zoomed)
+        #print("zoomed in main file", zoomed)
 
 
         # ------TRACKING------#

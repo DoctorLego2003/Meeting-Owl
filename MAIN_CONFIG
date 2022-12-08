@@ -29,8 +29,8 @@ tracking_treshhold_high: 50
 
 # lip_detection
 yawn_threshold: 35
-relatief_verschil_waarde: 5
-zerocount_buffer_count: 10
+relatief_verschil_waarde: 8
+zerocount_buffer_count: 20
 
 # gestures
 extra_width: 1.5

@@ -165,13 +165,14 @@ def track(faces, zoomed, YAML_DATA):
         #print('new:', new_faces)
     #print('faces: ', faces)
     #print('new_faces: ', new_faces)
-    #print('faces1:', faces)
+    print('faces1:', faces)
     check_for_double_faces(new_faces)
     #print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    #print('faces3:', new_faces)
+    print('faces3:', new_faces)
     #print('zoomed', zoomed)
     #print('faces4:', new_faces)
+    print('---------------------')
     return new_faces
 
 def check_for_doubles(zoomed):
@@ -257,10 +258,11 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     show = []
     #check_for_doubles(zoomed)
     #check_for_empty(zoomed)
+
     i = 0
     while 0 <= i < len(faces):
         if len(faces) > len(zoomed):
-            zoomed.append([[], 2, [], str(), False])
+            zoomed.append([[], 3, [], str(), False])
         # -----SHOW RECTANGLE-----#
 
         # -----SHOW RECTANGLE-----#
@@ -277,7 +279,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
         # print('prev zoomed:', zoomed)
         # print('prev faces:', faces)
-        if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
+        changed = False
+        if zoomed[i][0] != faces[i]:
             c = 0.1
             if len(zoomed[i][0]) == len(faces[i]) and len(faces[i]) != 0:
                 for j in range(4):
@@ -286,8 +289,9 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         faces[i][j] = int(number + 1)
                     else:
                         faces[i][j] = int(number)
-            #cv2.imshow('faces' + str(i+1), faces[i])
-
+                changed = True
+        #cv2.imshow('faces' + str(i + 1), faces[i])
+        if zoomed[i][0] != faces[i] or changed:
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1
         elif zoomed[i][1] > 0:
@@ -302,6 +306,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
         if zoomed[i][1] == 0:
             zoomed.remove(zoomed[i])
+            faces.remove(faces[i])
             i -= 1
 
         elif (zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']) and (zoomed[i][1] <= YAML_DATA['tracking_treshhold_high']):
@@ -394,10 +399,11 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
 
-    #print(show)
+
+    print('items in show', len(show))
     organise(show)
 
-    #print('zoomed:', zoomed)
+    print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
 
