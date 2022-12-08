@@ -115,7 +115,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
             #print(talklist)
             #if zerocount >= 10:
             #    talklist= 0
-            if talklist >= 4:
+            if talklist >= 8:
                 Talking = True
                 zerocount = 0
                 #print("Talking")
