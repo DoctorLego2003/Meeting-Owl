@@ -105,7 +105,7 @@ def track(faces, zoomed, YAML_DATA):
         dist.append([])
         for punt in faces:
             dist[i].append(distance(zoomed[i][0], punt))
-    print('dist:', dist)
+    # print('dist:', dist)
     #calculating lowest distance per point
     min_ind = []
     for i in range(len(dist)):
@@ -124,7 +124,7 @@ def track(faces, zoomed, YAML_DATA):
                         dist[i][index_new] = -1
                 else:
                     min_ind[i].append(dist[i].index(mini))
-    print('min_ind:', min_ind)
+    # print('min_ind:', min_ind)
     ## better filtering for equal lengths between faces
 
     i = 0
@@ -211,13 +211,13 @@ def check_for_empty(zoomed):
 
 # while True:
 #img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model
-def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, counterpounter =0):
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, testconn2sender):
 
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
     faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
-    print('faces:', faces, len(faces))
+    # print('faces:', faces, len(faces))
     faces = track(faces, zoomed, YAML_DATA)
     show = []
     #check_for_doubles(zoomed)
@@ -286,8 +286,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             else:
                 y_start = 0
             y_eind = len(img)
-        print('prev zoomed:', zoomed)
-        print('prev faces:', faces)
+        # print('prev zoomed:', zoomed)
+        # print('prev faces:', faces)
         if zoomed[i][0] != faces[i] or len(zoomed[i][0]) == 0:
             if len(zoomed[i][0]) == 0:
                 zoomed[i][1] = 1
@@ -433,8 +433,15 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     #print(show)
     organise(show)
 
-    print('zoomed:', zoomed)
+    # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
+
+
+    # zoomed doorsturen zodat de face recognition dit kan gebruiken bij verder calculaties
+
+
+    # print("zoomed in tracking", zoomed)
+    # testconn2sender.send(zoomed)
 
 
 
