@@ -51,7 +51,7 @@ def load_YAML():
         except yaml.YAMLError as exc:
             print(exc)
 
-        #print(YAML_DATA)
+        print(YAML_DATA)
         return YAML_DATA
         # for key in YAML_DATA:
         #     print(key, "=", YAML_DATA[key], "|", end=" ")
@@ -111,30 +111,29 @@ def capture_vid(streamer):
         if ret:
             streamer.send(img)
 
-def face_reco(connectie, event, lock, stream, ):
+def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
     while True:
         lock.acquire()
         frame = stream.recv()
         lock.release()
 
         # test om shit te ontvangen met de pipe
-        #test_data = testconn1reciever.recv()
-        #print("test_data", test_data)
+        test_data = testconn1reciever.recv()
+        print("test_data", test_data)
 
-        #zoomed = test_data
+        zoomed = test_data
 
 
         # print("face_recog loop")
 
         zoomed_coords = []
-        zoomed = []
 
 
 
-#        if testevent.is_set():
- #           recieved_data = testconn1reciever.recv()
-  #          #print("recieved_data", recieved_data)
-   #         # testevent.set()
+        if testevent.is_set():
+            recieved_data = testconn1reciever.recv()
+            print("recieved_data", recieved_data)
+            # testevent.set()
 
 
 
@@ -166,8 +165,8 @@ def face_reco(connectie, event, lock, stream, ):
         event.clear()
         event.wait()
 
-        #testevent.clear()
-        #testevent.wait()
+        testevent.clear()
+        testevent.wait()
 
 
 
@@ -186,15 +185,15 @@ def MAIN(YAML_DATA, ptime):
     event = multiprocessing.Event()
     event.set()
 
-    #testevent = multiprocessing.Event()
-    #testevent.set()
+    # testevent = multiprocessing.Event()
+    # testevent.set()
 
 
 
 
 
     # test
-    #testconn1reciever, testconn2sender = multiprocessing.Pipe()
+    # testconn1reciever, testconn2sender = multiprocessing.Pipe()
 
 
 
@@ -204,7 +203,7 @@ def MAIN(YAML_DATA, ptime):
     if YAML_DATA['display_face_recognition'] == True:
         face_data_reciever, face_data_sender = multiprocessing.Pipe()
         # print(face_data_reciever, face_data_sender)
-        proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream,))
+        proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, testconn1reciever, testevent))
         proces.start()
 
     # lock.acquire()
@@ -225,12 +224,12 @@ def MAIN(YAML_DATA, ptime):
 
         # ------TRACKING------#
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model)
+        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model) # +testconn2sender
         # ------TRACKING------#
 
         # zoomed has been changed
 
-        #testconn2sender.send(zoomed)
+        # testconn2sender.send(zoomed)
 
 
 
@@ -242,7 +241,7 @@ def MAIN(YAML_DATA, ptime):
                 event.set()
                 # print("heeft facedetectie gedaan")
                 # for data in face_data:
-                #     #print(data)
+                #     print(data)
                 #     face_encodings.append(list(data[1]))
                 #     face_locations.append(list(data[0]))
                     # face_data = [data[0] for data in face_data]

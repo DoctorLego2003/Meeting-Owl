@@ -104,7 +104,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         if breedteface==0:
             breedteface == 1
         relatief_verschil = verschillip*verschilmond/breedteface*100
-        print(relatief_verschil)
+        #print(relatief_verschil)
         #print(relatief_verschil)
 
 
@@ -115,7 +115,7 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
             #print(talklist)
             #if zerocount >= 10:
             #    talklist= 0
-            if talklist >= 4:
+            if talklist >= 8:
                 Talking = True
                 zerocount = 0
                 #print("Talking")
