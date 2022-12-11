@@ -14,7 +14,6 @@ from multiprocessing import Process, freeze_support
 import face_recognition
 
 
-
 # met deze file ander files callen zodat het wat overzichtelijker blijft
 
 # ------face detection------#
@@ -102,9 +101,32 @@ def capture_vid(streamer):
         assert len(img) > 0
     except:
         cap = cv2.VideoCapture(0)
-    video_capture = cap
+    # cap.release()
+    # print("external_camera_bool", external_camera_bool)
 
+    # for i in range(1,20):
+    #     try:
+    #         print(i)
+    #         cap = cv2.VideoCapture(i)
+    #         ret, img = cap.read()
+    #         assert len(img) > 0
+    #         print(len(img)>0)
+    #         break
+    #         # print(i)
+    #     except:
+    #     #     cap = cv2.VideoCapture(0)
+    #         continue
+
+    # if external_camera_bool == True:
+    #     cap = cv2.VideoCapture(1)
+    # else:
+    #     cap = cv2.VideoCapture(0)
+    # video_capture = cv2.VideoCapture(1)
+
+    video_capture = cap
     # video_capture = cv2.VideoCapture(0)
+
+    print(video_capture)
     # print("frame")
     while True:
         ret, img = video_capture.read()
@@ -118,22 +140,20 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
         lock.release()
 
         # test om shit te ontvangen met de pipe
-        test_data = testconn1reciever.recv()
-        print("test_data", test_data)
-
-        zoomed = test_data
-
-
+        # test_data = testconn1reciever.recv()
+        # print("test_data", test_data)
+        #
+        # zoomed = test_data
         # print("face_recog loop")
 
         zoomed_coords = []
-
-
+        # zoomed = []
 
         if testevent.is_set():
             recieved_data = testconn1reciever.recv()
             print("recieved_data", recieved_data)
-            # testevent.set()
+            testevent.set()
+            zoomed = recieved_data
 
 
 
@@ -165,8 +185,7 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
         event.clear()
         event.wait()
 
-        testevent.clear()
-        testevent.wait()
+
 
 
 
@@ -174,7 +193,7 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
 
 def MAIN(YAML_DATA, ptime):
     streamer, stream = multiprocessing.Pipe()
-    cam = Process(target=capture_vid, args=(streamer,))
+    cam = Process(target=capture_vid, args=(streamer, ))
     cam.start()
 
 
@@ -185,15 +204,15 @@ def MAIN(YAML_DATA, ptime):
     event = multiprocessing.Event()
     event.set()
 
-    # testevent = multiprocessing.Event()
-    # testevent.set()
+    testevent = multiprocessing.Event()
+    testevent.set()
 
 
 
 
 
     # test
-    # testconn1reciever, testconn2sender = multiprocessing.Pipe()
+    testconn1reciever, testconn2sender = multiprocessing.Pipe()
 
 
 
@@ -219,17 +238,21 @@ def MAIN(YAML_DATA, ptime):
         frame = stream.recv()
         lock.release()
 
-        #print("zoomed in main file", zoomed)
+        print("zoomed in main voor change", zoomed)
 
 
         # ------TRACKING------#
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model) # +testconn2sender
+        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, testconn2sender)
         # ------TRACKING------#
 
         # zoomed has been changed
+        print("zoomed in main na change", zoomed)
 
-        # testconn2sender.send(zoomed)
+        sent_zoomed = copy.deepcopy(zoomed)
+        testconn2sender.send(sent_zoomed)
+        testevent.clear()
+        # testevent.wait()
 
 
 
@@ -304,8 +327,8 @@ def MAIN(YAML_DATA, ptime):
         #     break
         if cv2.waitKey(30) & 0xff == ord('q') or cv2.waitKey(1) & 0xFF == 27:
             break
-    cap.release()
-    cv2.destroyAllWindows()
+        cap.release()
+        cv2.destroyAllWindows()
 
 
 
@@ -346,15 +369,22 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture(0)
     # ret, img = cap.read()
     # frame = img
-    try:
-        cap = cv2.VideoCapture(1)
-        ret, img = cap.read()
-        assert len(img) > 0
-    except:
-        cap = cv2.VideoCapture(0)
+    # external_camera_bool = False
+    # try:
+    #     cap = cv2.VideoCapture(1)
+    #     ret, img = cap.read()
+    #     assert len(img) > 0
+    #     external_camera_bool = True
+    #     cv2.imshow('Live: ', img)
+    #     # cv2.waitKey()
+    # except:
+    #     cap = cv2.VideoCapture(0)
+    #     external_camera_bool = False
+    # cap.release()
+    # print("external_camera_bool", external_camera_bool)
 
     # face_locations = face_recognition.face_locations(frame)
     # face_encodings = face_recognition.face_encodings(frame, face_locations)
     # cap.release()
-
+    print("run MAIN")
     MAIN(YAML_DATA, ptime)
