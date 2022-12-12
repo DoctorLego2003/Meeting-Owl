@@ -165,14 +165,14 @@ def track(faces, zoomed, YAML_DATA):
         #print('new:', new_faces)
     #print('faces: ', faces)
     #print('new_faces: ', new_faces)
-    print('faces1:', faces)
+    # print('faces1:', faces)
     check_for_double_faces(new_faces)
     #print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    print('faces3:', new_faces)
+    # print('faces3:', new_faces)
     #print('zoomed', zoomed)
     #print('faces4:', new_faces)
-    print('---------------------')
+    # print('---------------------')
     return new_faces
 
 def check_for_doubles(zoomed):
@@ -400,7 +400,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
 
-    print('items in show', len(show))
+    # print('items in show', len(show))
     organise(show)
 
     print('zoomed:', zoomed)

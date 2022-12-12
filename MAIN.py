@@ -149,11 +149,16 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
         zoomed_coords = []
         # zoomed = []
 
-        if testevent.is_set():
-            recieved_data = testconn1reciever.recv()
-            print("recieved_data", recieved_data)
-            testevent.set()
-            zoomed = recieved_data
+        # if testevent.is_set():
+        # recieved_data = testconn1reciever.recv()
+        # print("recieved_data", recieved_data)
+        # testevent.set()
+
+        testevent.set()
+        recieved_data = testconn1reciever.recv()
+        print("recieved_data", recieved_data)
+        zoomed = recieved_data
+
 
 
 
@@ -182,12 +187,9 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
 
         # print("1", face_locations2, face_encodings)
         connectie.send(zip(face_locations2, face_encodings))
+        print("sent face enc")
         event.clear()
         event.wait()
-
-
-
-
 
 
 
@@ -204,16 +206,13 @@ def MAIN(YAML_DATA, ptime):
     event = multiprocessing.Event()
     event.set()
 
-    testevent = multiprocessing.Event()
-    testevent.set()
-
-
 
 
 
     # test
     testconn1reciever, testconn2sender = multiprocessing.Pipe()
-
+    testevent = multiprocessing.Event()
+    testevent.set()
 
 
 
@@ -250,16 +249,24 @@ def MAIN(YAML_DATA, ptime):
         print("zoomed in main na change", zoomed)
 
         sent_zoomed = copy.deepcopy(zoomed)
-        testconn2sender.send(sent_zoomed)
-        testevent.clear()
+        if testevent.is_set():
+            testconn2sender.send(sent_zoomed)
+            testevent.clear()
+            # testevent.set()
+        # testevent.clear()
         # testevent.wait()
 
 
 
         if YAML_DATA['display_face_recognition'] == True:
-
             if not event.is_set():
                 face_data = list(face_data_reciever.recv())
+
+                # testconn2sender.send(sent_zoomed)
+
+                # testconn2sender.send(sent_zoomed)
+                # testevent.set()
+
                 # print(face_data)
                 event.set()
                 # print("heeft facedetectie gedaan")
@@ -286,6 +293,7 @@ def MAIN(YAML_DATA, ptime):
                 # print(face_data)q
 
             face_names = []
+            print("len face_data_rec = ", len(face_data))
             for i, face_location in enumerate(face_data):
                 # print(face_location)
                 (x, y, w, h) = face_location
@@ -298,6 +306,8 @@ def MAIN(YAML_DATA, ptime):
                 if True in matches:
                     first_match_index = matches.index(True)
                     name = known_face_names[first_match_index]
+
+                print(name)
 
 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
@@ -321,14 +331,16 @@ def MAIN(YAML_DATA, ptime):
 
         cv2.imshow('Live: ', frame)
 
+        print("---------------")
+
 
         # k = cv2.waitKey(30) & 0xff
         # if k == ord('q'):
         #     break
         if cv2.waitKey(30) & 0xff == ord('q') or cv2.waitKey(1) & 0xFF == 27:
             break
-        cap.release()
-        cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 
@@ -370,17 +382,17 @@ if __name__ == "__main__":
     # ret, img = cap.read()
     # frame = img
     # external_camera_bool = False
-    # try:
-    #     cap = cv2.VideoCapture(1)
-    #     ret, img = cap.read()
-    #     assert len(img) > 0
-    #     external_camera_bool = True
-    #     cv2.imshow('Live: ', img)
-    #     # cv2.waitKey()
-    # except:
-    #     cap = cv2.VideoCapture(0)
-    #     external_camera_bool = False
-    # cap.release()
+    try:
+        cap = cv2.VideoCapture(1)
+        ret, img = cap.read()
+        assert len(img) > 0
+        # external_camera_bool = True
+        # cv2.imshow('Live: ', img)
+        # cv2.waitKey()
+    except:
+        cap = cv2.VideoCapture(0)
+        # external_camera_bool = False
+    cap.release()
     # print("external_camera_bool", external_camera_bool)
 
     # face_locations = face_recognition.face_locations(frame)
