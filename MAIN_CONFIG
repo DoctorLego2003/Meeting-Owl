@@ -3,7 +3,7 @@
 
 # ------SETUP------#
 # gewoon face_detection tonen op output
-display_face_detection: False
+display_face_detection: True
 # zoomed in windows tonen als extra output
 display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
