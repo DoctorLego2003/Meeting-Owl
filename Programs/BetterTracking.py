@@ -262,7 +262,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     i = 0
     while 0 <= i < len(faces):
         if len(faces) > len(zoomed):
-            zoomed.append([[], 3, [], str(), False])
+            zoomed.append([[], 3, [], str(), False, []])
         # -----SHOW RECTANGLE-----#
 
         # -----SHOW RECTANGLE-----#
@@ -403,7 +403,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     # print('items in show', len(show))
     organise(show)
 
-    print('zoomed:', zoomed)
+    # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
 
