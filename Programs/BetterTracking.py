@@ -165,14 +165,14 @@ def track(faces, zoomed, YAML_DATA):
         #print('new:', new_faces)
     #print('faces: ', faces)
     #print('new_faces: ', new_faces)
-    print('faces1:', faces)
+    # print('faces1:', faces)
     check_for_double_faces(new_faces)
     #print('faces2:', faces)
     check_for_empty_faces(new_faces)
-    print('faces3:', new_faces)
+    # print('faces3:', new_faces)
     #print('zoomed', zoomed)
     #print('faces4:', new_faces)
-    print('---------------------')
+    # print('---------------------')
     return new_faces
 
 def check_for_doubles(zoomed):
@@ -248,7 +248,7 @@ def make_frame(img, face):
 
 # while True:
 #img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, distancevorige, face_model, landmark_model
-def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model): #+ testconn2sender
+def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, testconn2sender): #+ testconn2sender
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
@@ -262,7 +262,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     i = 0
     while 0 <= i < len(faces):
         if len(faces) > len(zoomed):
-            zoomed.append([[], 3, [], str(), False])
+            zoomed.append([[], 3, [], str(), False, []])
         # -----SHOW RECTANGLE-----#
 
         # -----SHOW RECTANGLE-----#
@@ -400,10 +400,10 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed.remove(zoomed[i])
 
 
-    print('items in show', len(show))
+    # print('items in show', len(show))
     organise(show)
 
-    print('zoomed:', zoomed)
+    # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
 
 
