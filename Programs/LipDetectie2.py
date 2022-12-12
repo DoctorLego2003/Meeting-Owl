@@ -103,9 +103,9 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
         #print("verschilmond", verschilmond)
         if breedteface==0:
             breedteface == 1
-        relatief_verschil = verschillip*verschilmond/breedteface*100
+        relatief_verschil = (verschillip+verschilmond)/breedteface*200
         #print(relatief_verschil)
-        #print(relatief_verschil)
+        print(relatief_verschil)
 
 
         # if relatief_verschil >=10:
