@@ -34,26 +34,29 @@ def prev_id(current_id, worker_num):
 
 
 # A subprocess use to capture frames.
-def capture(read_frame_list, Global, worker_num):
+def capture(read_frame_list, Global, worker_num, frame):
     # Get a reference to webcam #0 (the default one)
-    video_capture = cv2.VideoCapture(0)
+
+    # video_capture = cv2.VideoCapture(0)
+
     # video_capture.set(3, 640)  # Width of the frames in the video stream.
     # video_capture.set(4, 480)  # Height of the frames in the video stream.
     # video_capture.set(5, 30) # Frame rate.
-    print("Width: %d, Height: %d, FPS: %d" % (video_capture.get(3), video_capture.get(4), video_capture.get(5)))
+
+    # print("Width: %d, Height: %d, FPS: %d" % (video_capture.get(3), video_capture.get(4), video_capture.get(5)))
 
     while not Global.is_exit:
         # If it's time to read a frame
         if Global.buff_num != next_id(Global.read_num, worker_num):
             # Grab a single frame of video
-            ret, frame = video_capture.read()
+            # ret, frame = video_capture.read()
             read_frame_list[Global.buff_num] = frame
             Global.buff_num = next_id(Global.buff_num, worker_num)
         else:
             time.sleep(0.01)
 
     # Release webcam
-    video_capture.release()
+    # video_capture.release()
 
 
 # Many subprocess use to process frames.
@@ -144,8 +147,8 @@ def main_face_recogntion(img, YAML_DATA):
     p = []
 
     # Create a thread to capture frames (if uses subprocess, it will crash on Mac)
-    # p.append(threading.Thread(target=capture, args=(read_frame_list, Global, worker_num,)))
-    # p[0].start()
+    p.append(threading.Thread(target=capture, args=(read_frame_list, Global, worker_num, img,)))
+    p[0].start()
 
     # Load a sample picture and learn how to recognize it.
     obama_image = face_recognition.load_image_file("images/obama.jpg")
