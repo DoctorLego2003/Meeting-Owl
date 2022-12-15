@@ -394,7 +394,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     #    cv2.destroyWindow('Zoom in ' + str(i + 1))
             i += 1
         elif zoomed[i][1] == 0:
-            print('trying to remove')
+            #print('trying to remove')
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])

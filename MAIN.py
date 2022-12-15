@@ -50,7 +50,7 @@ def load_YAML():
         except yaml.YAMLError as exc:
             print(exc)
 
-        print(YAML_DATA)
+        #print(YAML_DATA)
         return YAML_DATA
         # for key in YAML_DATA:
         #     print(key, "=", YAML_DATA[key], "|", end=" ")
@@ -76,7 +76,7 @@ def load_encoding_images(images_path):
     # Load Images
     images_path = glob.glob(os.path.join(images_path, "*.*"))
 
-    print("{} encoding images found.".format(len(images_path)))
+    #print("{} encoding images found.".format(len(images_path)))
 
     # Store image encoding and names
     for img_path in images_path:
@@ -92,7 +92,7 @@ def load_encoding_images(images_path):
         # Store file name and file encoding
         known_face_encodings.append(img_encoding)
         known_face_names.append(filename)
-    print("Encoding images loaded")
+    #print("Encoding images loaded")
 
 def capture_vid(streamer):
     try:
@@ -126,7 +126,7 @@ def capture_vid(streamer):
     video_capture = cap
     # video_capture = cv2.VideoCapture(0)
 
-    print(video_capture)
+    #print(video_capture)
     # print("frame")
     while True:
         ret, img = video_capture.read()
@@ -156,7 +156,7 @@ def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
 
         zoomed_event.set()
         zoomed = zoomed_reciever.recv()
-        print("recieved_zoomed", zoomed)
+        #print("recieved_zoomed", zoomed)
 
 
 
@@ -308,18 +308,18 @@ def MAIN(YAML_DATA, ptime):
                 # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
 
-            print(name_coord_linking_list)
+            #print(name_coord_linking_list)
 
             for i in range(len(zoomed)):
                 for j in range(len(name_coord_linking_list)):
 
                     # print(name_coord_linking_list[j][0])
                     # (face_location, name)
-                    print(name_coord_linking_list[j][0])
+                    #print(name_coord_linking_list[j][0])
                     if zoomed[i][5] == list(name_coord_linking_list[j][0]):
                         zoomed[i][3] = name_coord_linking_list[j][1]
 
-        print("last_print", zoomed)
+        #print("last_print", zoomed)
 
 
 
@@ -328,7 +328,7 @@ def MAIN(YAML_DATA, ptime):
             zoomed_sender.send(sent_zoomed)
             zoomed_event.clear()
 
-            print("sent_zoomed", sent_zoomed)
+            #print("sent_zoomed", sent_zoomed)
             for i in range(len(zoomed)):
                 zoomed[i][5] = sent_zoomed[i][0]  # dit add de fixed coodinates voordat de face_recognition gedaan wordt
 
@@ -359,7 +359,7 @@ def MAIN(YAML_DATA, ptime):
 
         cv2.imshow('Live: ', frame)
 
-        print("---------------")
+        #print("---------------")
 
 
         # k = cv2.waitKey(30) & 0xff
@@ -426,5 +426,5 @@ if __name__ == "__main__":
     # face_locations = face_recognition.face_locations(frame)
     # face_encodings = face_recognition.face_encodings(frame, face_locations)
     # cap.release()
-    print("run MAIN")
+    #print("run MAIN")
     MAIN(YAML_DATA, ptime)
