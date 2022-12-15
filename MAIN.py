@@ -14,7 +14,6 @@ from multiprocessing import Process, freeze_support
 import face_recognition
 
 
-
 # met deze file ander files callen zodat het wat overzichtelijker blijft
 
 # ------face detection------#
@@ -102,38 +101,62 @@ def capture_vid(streamer):
         assert len(img) > 0
     except:
         cap = cv2.VideoCapture(0)
-    video_capture = cap
+    # cap.release()
+    # print("external_camera_bool", external_camera_bool)
 
+    # for i in range(1,20):
+    #     try:
+    #         print(i)
+    #         cap = cv2.VideoCapture(i)
+    #         ret, img = cap.read()
+    #         assert len(img) > 0
+    #         print(len(img)>0)
+    #         break
+    #         # print(i)
+    #     except:
+    #     #     cap = cv2.VideoCapture(0)
+    #         continue
+
+    # if external_camera_bool == True:
+    #     cap = cv2.VideoCapture(1)
+    # else:
+    #     cap = cv2.VideoCapture(0)
+    # video_capture = cv2.VideoCapture(1)
+
+    video_capture = cap
     # video_capture = cv2.VideoCapture(0)
+
+    print(video_capture)
     # print("frame")
     while True:
         ret, img = video_capture.read()
         if ret:
             streamer.send(img)
 
-def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
+def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
     while True:
         lock.acquire()
         frame = stream.recv()
         lock.release()
 
         # test om shit te ontvangen met de pipe
-        test_data = testconn1reciever.recv()
-        print("test_data", test_data)
-
-        zoomed = test_data
-
-
+        # test_data = testconn1reciever.recv()
+        # print("test_data", test_data)
+        #
+        # zoomed = test_data
         # print("face_recog loop")
 
         zoomed_coords = []
+        # zoomed = []
 
+        # if testevent.is_set():
+        # recieved_data = testconn1reciever.recv()
+        # print("recieved_data", recieved_data)
+        # testevent.set()
 
-
-        if testevent.is_set():
-            recieved_data = testconn1reciever.recv()
-            print("recieved_data", recieved_data)
-            # testevent.set()
+        zoomed_event.set()
+        zoomed = zoomed_reciever.recv()
+        print("recieved_zoomed", zoomed)
 
 
 
@@ -160,41 +183,37 @@ def face_reco(connectie, event, lock, stream, testconn1reciever, testevent):
 
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations2)
 
-        # print("1", face_locations2, face_encodings)
+        # print("1", face_locations2)
         connectie.send(zip(face_locations2, face_encodings))
+        # connectie.send(zip(zoomed_coords, face_encodings))  # hier behoudt die de [x,y,w,h] coord stijl
+        # print("sent face enc")
         event.clear()
         event.wait()
-
-        testevent.clear()
-        testevent.wait()
-
-
 
 
 
 def MAIN(YAML_DATA, ptime):
     streamer, stream = multiprocessing.Pipe()
-    cam = Process(target=capture_vid, args=(streamer,))
+    cam = Process(target=capture_vid, args=(streamer, ))
     cam.start()
 
 
     face_encodings = []
-    face_locations = []
+    # face_locations = []
+    face_data = []
+    sent_zoomed = []
 
     lock = multiprocessing.RLock()
     event = multiprocessing.Event()
     event.set()
 
-    # testevent = multiprocessing.Event()
-    # testevent.set()
-
-
 
 
 
     # test
-    # testconn1reciever, testconn2sender = multiprocessing.Pipe()
-
+    zoomed_reciever, zoomed_sender = multiprocessing.Pipe()
+    zoomed_event = multiprocessing.Event()
+    zoomed_event.set()
 
 
 
@@ -203,7 +222,7 @@ def MAIN(YAML_DATA, ptime):
     if YAML_DATA['display_face_recognition'] == True:
         face_data_reciever, face_data_sender = multiprocessing.Pipe()
         # print(face_data_reciever, face_data_sender)
-        proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, testconn1reciever, testevent))
+        proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, zoomed_reciever, zoomed_event))
         proces.start()
 
     # lock.acquire()
@@ -211,7 +230,6 @@ def MAIN(YAML_DATA, ptime):
     # # rgb_frame = frame[:, :, ::-1]
     # lock.release()
 
-    face_data = []
 
     # MAIN TRUE LOOP VAN HET PROGRAMMA
     while True:
@@ -219,25 +237,25 @@ def MAIN(YAML_DATA, ptime):
         frame = stream.recv()
         lock.release()
 
-        #print("zoomed in main file", zoomed)
+        # print("zoomed in main voor change", zoomed)
 
 
         # ------TRACKING------#
         gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model) # +testconn2sender
+        main_tracking(frame, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascade, face_model, landmark_model, zoomed_sender)
         # ------TRACKING------#
 
         # zoomed has been changed
+        # print("zoomed in main na change", zoomed)
 
-        # testconn2sender.send(zoomed)
 
 
 
         if YAML_DATA['display_face_recognition'] == True:
 
             if not event.is_set():
-                face_data = list(face_data_reciever.recv())
-                # print(face_data)
+                face_data = list(face_data_reciever.recv())  # hier ontvangt die de locations van de gezichten en de encodings die hij gaat matchen aan shit
+
                 event.set()
                 # print("heeft facedetectie gedaan")
                 # for data in face_data:
@@ -257,28 +275,71 @@ def MAIN(YAML_DATA, ptime):
                 # print(face_data)
 
                 # face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
-
                 face_data = [(data[3], data[0], data[2] - data[0], data[1] - data[3]) for data in face_data]
                 # print("2", face_data)
-                # print(face_data)q
+                # print(face_data)
 
-            face_names = []
+
+            name_coord_linking_list = []
+            # face_names = []
+            # print("len face_data_rec = ", len(face_data))
             for i, face_location in enumerate(face_data):
                 # print(face_location)
-                (x, y, w, h) = face_location
+                (x, y, w, h) = face_location  # in [x,y,w,h] coordinaten
 
                 # HIER WORDEN MATCHES VERGELEKEN MET ELKAAR
                 matches = face_recognition.compare_faces(known_face_encodings, face_encodings[i])
-                name = "Unknown"
+                # name = "Unknown"
+                name = str()
                 # print(matches)
 
                 if True in matches:
                     first_match_index = matches.index(True)
                     name = known_face_names[first_match_index]
 
+                name_coord_linking_list.append((face_location, name))
+
+
+                # print(name_coord_linking_list)
+                # print(name)
+
 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
+                # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+
+            print(name_coord_linking_list)
+
+            for i in range(len(zoomed)):
+                for j in range(len(name_coord_linking_list)):
+
+                    # print(name_coord_linking_list[j][0])
+                    # (face_location, name)
+                    print(name_coord_linking_list[j][0])
+                    if zoomed[i][5] == list(name_coord_linking_list[j][0]):
+                        zoomed[i][3] = name_coord_linking_list[j][1]
+
+        print("last_print", zoomed)
+
+
+
+        if zoomed_event.is_set():
+            sent_zoomed = copy.deepcopy(zoomed)  # verzonden zoomed coordinaten
+            zoomed_sender.send(sent_zoomed)
+            zoomed_event.clear()
+
+            print("sent_zoomed", sent_zoomed)
+            for i in range(len(zoomed)):
+                zoomed[i][5] = sent_zoomed[i][0]  # dit add de fixed coodinates voordat de face_recognition gedaan wordt
+
+            #
+            # for i in range(len(zoomed)):
+            #     zoomed[i][5] = zoomed[i][0]  # dit add de fixed coodinates voordat de face_recognition gedaan wordt
+
+            # testevent.set()
+        # testevent.clear()
+        # testevent.wait()
+
 
 
 
@@ -297,6 +358,8 @@ def MAIN(YAML_DATA, ptime):
 
 
         cv2.imshow('Live: ', frame)
+
+        print("---------------")
 
 
         # k = cv2.waitKey(30) & 0xff
@@ -346,15 +409,22 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture(0)
     # ret, img = cap.read()
     # frame = img
+    # external_camera_bool = False
     try:
         cap = cv2.VideoCapture(1)
         ret, img = cap.read()
         assert len(img) > 0
+        # external_camera_bool = True
+        # cv2.imshow('Live: ', img)
+        # cv2.waitKey()
     except:
         cap = cv2.VideoCapture(0)
+        # external_camera_bool = False
+    cap.release()
+    # print("external_camera_bool", external_camera_bool)
 
     # face_locations = face_recognition.face_locations(frame)
     # face_encodings = face_recognition.face_encodings(frame, face_locations)
     # cap.release()
-
+    print("run MAIN")
     MAIN(YAML_DATA, ptime)
