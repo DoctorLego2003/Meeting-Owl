@@ -93,7 +93,7 @@ def distance(point_one, point_two):
         return float('inf')
     [x1, y1, w0, h0] = point_one
     [x2, y2, w1, h1] = point_two
-    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)
     return dist
 
 def track(faces, zoomed, YAML_DATA):
@@ -394,7 +394,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     #    cv2.destroyWindow('Zoom in ' + str(i + 1))
             i += 1
         elif zoomed[i][1] == 0:
-            print('trying to remove')
+            #print('trying to remove')
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])

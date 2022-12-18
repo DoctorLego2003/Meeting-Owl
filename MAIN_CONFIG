@@ -23,7 +23,7 @@ display_FPS: True
 
 
 # tracking
-minimum_distance: 500
+minimum_distance: 1000
 tracking_treshhold_low: 15
 tracking_treshhold_high: 50
 
