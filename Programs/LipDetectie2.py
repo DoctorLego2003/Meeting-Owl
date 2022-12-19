@@ -127,18 +127,17 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
                 talklist = 0
                 Talking = False
                 #print("Not Talking")
-
-        if Talking == True:
-            cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-            #print("Talking")
-        else:
-            cv2.putText(frame, "Not Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 200, 0), 2)
-            #print("Not talking")
-
         if distancevorige == lip_dist and breedtemondvorige == breedtemond:
             Talking = False
+
+        if YAML_DATA['display_lip_output']:
+            if Talking:
+                cv2.putText(frame, "Talking", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 0), 2)
+                #print("Talking")
+            else:
+                cv2.putText(frame, "Not Talking", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 200), 2)
+            #print("Not talking")
+
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 

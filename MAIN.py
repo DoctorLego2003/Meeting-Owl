@@ -303,10 +303,10 @@ def MAIN(YAML_DATA, ptime):
                 # print(name_coord_linking_list)
                 # print(name)
 
-
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
-                # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-                cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
+                if YAML_DATA['display_delayed_detection']:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
+                    # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+                    cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
 
             #print(name_coord_linking_list)
 
@@ -316,7 +316,7 @@ def MAIN(YAML_DATA, ptime):
                     # print(name_coord_linking_list[j][0])
                     # (face_location, name)
                     #print(name_coord_linking_list[j][0])
-                    if zoomed[i][5] == list(name_coord_linking_list[j][0]):
+                    if zoomed[i][5] == list(name_coord_linking_list[j][0]) and len(name_coord_linking_list[j][1]) != 0:
                         zoomed[i][3] = name_coord_linking_list[j][1]
 
         #print("last_print", zoomed)

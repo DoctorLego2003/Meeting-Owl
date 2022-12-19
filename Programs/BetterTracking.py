@@ -280,16 +280,23 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
         # print('prev zoomed:', zoomed)
         # print('prev faces:', faces)
+
+        #(x, y, w, h) = faces[i]
+        #cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+
         changed = False
         if zoomed[i][0] != faces[i]:
             c = 0.1
             if len(zoomed[i][0]) == len(faces[i]) and len(faces[i]) != 0:
                 for j in range(4):
                     number = c * faces[i][j] + (1 - c) * zoomed[i][0][j]
+                    '''
                     if int(number) < int(number + 0.5):
                         faces[i][j] = int(number + 1)
                     else:
-                        faces[i][j] = int(number)
+                    '''
+                    faces[i][j] = int(number)
+
                 changed = True
         #cv2.imshow('faces' + str(i + 1), faces[i])
         if zoomed[i][0] != faces[i] or changed:
@@ -299,8 +306,11 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
 
         x_start, x_eind, y_start, y_eind = make_frame(img, faces[i])
+        (x, y, w, h) = faces[i]
+
+        #cv2.circle(img, (x,y), 100, (0,0,0), 1)
+
         if YAML_DATA['display_face_detection']:
-            (x, y, w, h) = faces[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
 
         zoomed[i][0] = faces[i]
@@ -320,7 +330,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 b = YAML_DATA['extra_height']
                 x_end = int(x + (1+a)*w)
                 y_end = int(y + (1+b)*h)
-                x_new = x - w
+                x_new = int(x - a * w)
                 if x_end >= len(img[0]):
                     x_end = len(img[0]) - 1
                     x_new = min(len(img[0]) - int((2*a+1)*w), x_new)
@@ -332,7 +342,12 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         x_end = len(img[0])
                 if y_end > len(img):
                     y_end = len(img) - 1
-                hand_frame = img[y:y_end, x_new:x_end]
+                hand_frame1 = img[y:y_end, x_new:x]
+                hand_frame2 = img[y:y_end, x + w: x_end]
+                hand_frame = np.hstack((hand_frame1, hand_frame2))
+                #hand_frame = cv2.resize(hand_frame,)
+                if len(hand_frame) != 0 and YAML_DATA['display_gesture_frame']:
+                    cv2.imshow('gesture_frame', hand_frame)
                 gesture = main_hand_gestures(hand_frame, YAML_DATA)
                 if gesture != None:
                     zoomed[i][4] = gesture
@@ -389,7 +404,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
             if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
                 x_start, x_eind, y_start, y_eind = make_frame(img, zoomed[i][0])
-                #head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
+                head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
                     Talk = False
                     if YAML_DATA['display_lip_detection']:
@@ -400,7 +415,6 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         if zoomed[i][4]:
                             Gest = True
                     if Talk or Gest:
-                        head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                         if len(zoomed[i][3]) == 0:
                             cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                         else:
@@ -411,7 +425,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                             cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
                         else:
                             cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
-                        head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (200, 200))
+                        head_frame = cv2.resize(head_frame, (200, 200))
                         show.append(head_frame)
                         #if len(zoomed[i][3]) == 0:
                             #cv2.imshow('Zoom in ' + str(i + 1), head_frame)
