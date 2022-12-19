@@ -25,7 +25,7 @@ def intersection(a,b):
 
 def detect_face_orientation(gray_img, face_cascade, profile_cascade):
     faces = []
-    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 3)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 3)
     gray_flipped = cv2.flip(gray_img, 1)
     """
@@ -296,9 +296,10 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     else:
                     '''
                     faces[i][j] = int(number)
-
+                
                 changed = True
         #cv2.imshow('faces' + str(i + 1), faces[i])
+
         if zoomed[i][0] != faces[i] or changed:
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1

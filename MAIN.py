@@ -76,7 +76,7 @@ def load_encoding_images(images_path):
     # Load Images
     images_path = glob.glob(os.path.join(images_path, "*.*"))
 
-    print("{} encoding images found.".format(len(images_path)))
+    #print("{} encoding images found.".format(len(images_path)))
 
     # Store image encoding and names
     for img_path in images_path:
@@ -156,7 +156,7 @@ def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
 
         zoomed_event.set()
         zoomed = zoomed_reciever.recv()
-        print("recieved_zoomed", zoomed)
+        #print("recieved_zoomed", zoomed)
 
 
 
@@ -426,5 +426,5 @@ if __name__ == "__main__":
     # face_locations = face_recognition.face_locations(frame)
     # face_encodings = face_recognition.face_encodings(frame, face_locations)
     # cap.release()
-    print("run MAIN")
+    #print("run MAIN")
     MAIN(YAML_DATA, ptime)
