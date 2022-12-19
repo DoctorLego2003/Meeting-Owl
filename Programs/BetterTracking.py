@@ -256,6 +256,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed, YAML_DATA)
     show = []
+    bigshow = []
     #check_for_doubles(zoomed)
     #check_for_empty(zoomed)
 
@@ -352,11 +353,29 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
-                if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                Talk = False
+                if YAML_DATA['display_lip_detection']:
+                    if zoomed[i][2][4]:
+                        Talk = True
+                Gest = False
+                if YAML_DATA['display_hand_gestures']:
+                    if zoomed[i][4]:
+                        Gest = True
+                #if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                if Talk or Gest:
                     if len(zoomed[i][3]) == 0:
                         cv2.putText(head_frame, str(i + 1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                     else:
                         cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    bigshow.append(head_frame)
+                else:
+                    head_frame = cv2.resize(head_frame, (200, 200))
+                    if len(zoomed[i][3]) == 0:
+                        cv2.putText(head_frame, str(i + 1), (5, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1,
+                                    cv2.LINE_AA)
+                    else:
+                        cv2.putText(head_frame, zoomed[i][3], (5, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255),
+                                    1, cv2.LINE_AA)
                     show.append(head_frame)
                 #elif not YAML_DATA['display_lip_detection'] and not YAML_DATA['display_hand_gestures']:
                 #    show.append(head_frame)
@@ -370,21 +389,29 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
             if zoomed[i][1] >= YAML_DATA['tracking_treshhold_low']:
                 x_start, x_eind, y_start, y_eind = make_frame(img, zoomed[i][0])
-                head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
+                #head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
-                    Talk = True
+                    Talk = False
                     if YAML_DATA['display_lip_detection']:
-                        if not zoomed[i][2][4]:
-                            Talk = False
-                    Gest = True
+                        if zoomed[i][2][4]:
+                            Talk = True
+                    Gest = False
                     if YAML_DATA['display_hand_gestures']:
-                        if not zoomed[i][4]:
-                            Gest = False
-                    if Talk and Gest:
+                        if zoomed[i][4]:
+                            Gest = True
+                    if Talk or Gest:
+                        head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                         if len(zoomed[i][3]) == 0:
                             cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                         else:
                             cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                        bigshow.append(head_frame)
+                    else:
+                        if len(zoomed[i][3]) == 0:
+                            cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                        else:
+                            cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                        head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (200, 200))
                         show.append(head_frame)
                         #if len(zoomed[i][3]) == 0:
                             #cv2.imshow('Zoom in ' + str(i + 1), head_frame)
@@ -401,7 +428,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
 
     # print('items in show', len(show))
-    organise(show)
+    organise(bigshow,show)
 
     # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
