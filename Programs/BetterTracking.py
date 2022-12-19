@@ -23,9 +23,16 @@ def intersection(a,b):
   if w<0 or h<0: return False
   return True
 
-def detect_face_orientation(gray_img, face_cascade, profile_cascade):
+def detect_face_orientation(gray_img, face_cascade, profile_cascade, rgb_frame):
     faces = []
     front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    # print(front_faces)
+    # front_faces = face_recognition.face_locations(rgb_frame)
+    # print(front_faces)
+    # front_faces = [[data[3], data[0], data[2] - data[0], data[1] - data[3]] for data in front_faces]
+    # print(front_faces)
+    # # front_faces.num
+    # front_faces = numpy.array(front_faces)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 3)
     gray_flipped = cv2.flip(gray_img, 1)
     """
@@ -252,7 +259,8 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 #    ret, img = cap.read()
 #    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #    faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
-    faces = detect_face_orientation(gray_img, face_cascade, profile_cascade)
+    rgb_frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    faces = detect_face_orientation(gray_img, face_cascade, profile_cascade, rgb_frame)
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed, YAML_DATA)
     show = []
@@ -394,7 +402,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     #    cv2.destroyWindow('Zoom in ' + str(i + 1))
             i += 1
         elif zoomed[i][1] == 0:
-            #print('trying to remove')
+            # print('trying to remove')
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
