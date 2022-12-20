@@ -222,7 +222,8 @@ def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
 def load_new_face_encodings(new_face_enc_sender, new_face_enc_event, YAML_DATA, enc_fac_reciever, enc_fac_event):
     wait_time = YAML_DATA['new_face_encoding_pull_time']
     while True:
-
+        # if cv2.waitKey(2) & 0xff == ord('r'):
+        print("tis gerefreshed")
 
 
         enc_fac_event.set()
@@ -232,10 +233,6 @@ def load_new_face_encodings(new_face_enc_sender, new_face_enc_event, YAML_DATA, 
         # enc = [data[0] for data in dat]
         # enc = dat[0]
         # fac = dat[1]
-
-
-
-
 
         fac = enc_fac_reciever.recv()
 
@@ -254,8 +251,6 @@ def load_new_face_encodings(new_face_enc_sender, new_face_enc_event, YAML_DATA, 
 
         new_face_enc_event.clear()
         new_face_enc_event.wait()
-
-
 
 def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
     streamer, stream = multiprocessing.Pipe()
@@ -330,7 +325,7 @@ def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
                 dat = list(new_face_enc_reciever.recv())
                 # met dat dat de namen en
                 new_face_enc_event.set()
-                print("dat", dat)
+                # print("dat", dat)
                 # ALS HET HIER ERRORT, TEVEEL IMAGES INGELADEN
                 nfnam, nfenc, tbrn = dat[0], dat[1], dat[2]
 
@@ -341,10 +336,10 @@ def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
                     enc.remove(enc[i - removed_counter])
                     removed_counter += 1
 
-                print("fac 1", fac)
+                # print("fac 1", fac)
                 fac += nfnam
                 enc += nfenc
-                print("fac 2", fac)
+                # print("fac 2", fac)
 
                 known_face_names = fac
                 known_face_encodings = enc
@@ -441,12 +436,12 @@ def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
         # print("last_print", zoomed)
 
 
-        if cv2.waitKey(2) & 0xff == ord('r'):
-            print("waiting for 10 seconds")
-            time.sleep(10)
+        # if cv2.waitKey(2) & 0xff == ord('r'):
+        #     print("waiting for 10 seconds")
+        #     time.sleep(10)
 
 
-        if enc_fac_event.is_set():
+        if enc_fac_event.is_set() and cv2.waitKey(1) & 0xff == ord('r'):
             # enc = copy.deepcopy(known_face_encodings)
             # fac = copy.deepcopy(known_face_names)
             # enc_fac_sender.send((enc, fac))
