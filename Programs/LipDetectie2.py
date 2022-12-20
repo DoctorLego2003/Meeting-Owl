@@ -16,11 +16,11 @@ def cal_yawn(shape, distancevorige, breedtemondvorige):
 
     top_mean = np.mean(top_lip, axis=0)
     low_mean = np.mean(low_lip, axis=0)
-    breedteface = (((shape[0][0]-shape[16][0])^2)+((shape[0][1]-shape[16][1])^2))*-1
+    breedteface = (((shape[0][0]-shape[16][0])**2)+((shape[0][1]-shape[16][1])**2))
 
-    distancenu = dist.euclidean(top_mean, low_mean)
+    distancenu = dist.euclidean(top_mean, low_mean) ** 2
 
-    breedtemondnu = (((shape[48][0]-shape[54][0])^2)+((shape[48][1]-shape[54][1])^2))*-1
+    breedtemondnu = (((shape[48][0]-shape[54][0])**2)+((shape[48][1]-shape[54][1])**2))
 
     #print(breedtemondnu)
     return distancenu, distancevorige, breedtemondnu, breedtemondvorige, breedteface
@@ -67,12 +67,14 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
     # img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     img_gray = gray_img
     faces = face_model(img_gray)
+    '''
     if len(faces) == 0:
         counter += 1
         if counter > 20:
             Talking = False
             counter = 0
         return distancevorige, breedtemondvorige, zerocount, talklist, Talking, counter
+    '''
     for face in faces:
 
 
@@ -88,22 +90,22 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
 
         # -------Calculating the lip distance-----#
         lip_dist, distancevorige, breedtemond, breedtemondvorige, breedteface = (cal_yawn(shape, distancevorige, breedtemondvorige))
-        breedteface = int(breedteface)
-        lip_dist = int(lip_dist)
-        breedtemond = int(breedtemond)
-        distancevorige = int(distancevorige)
-        breedtemondvorige = int(breedtemondvorige)
+        #breedteface = int(breedteface)
+        #lip_dist = int(lip_dist)
+        #breedtemond = int(breedtemond)
+        #distancevorige = int(distancevorige)
+        #breedtemondvorige = int(breedtemondvorige)
         verschilmond = abs(breedtemond - breedtemondvorige)
         verschillip = abs(lip_dist - distancevorige)
         #print(breedtemond)
-        if verschilmond <= 1:
-            verschilmond = 1
+        #if verschilmond <= 1:
+        #    verschilmond = 1
         #print(verschilmond)
         #print("verschillip",verschillip)
         #print("verschilmond", verschilmond)
-        if breedteface==0:
-            breedteface == 1
-        relatief_verschil = verschillip*verschilmond/breedteface*100
+        #if breedteface == 0:
+        #    breedteface == 1
+        relatief_verschil = verschillip * verschilmond / breedteface * 100
         #print(relatief_verschil)
         #print(relatief_verschil)
 
@@ -127,18 +129,17 @@ def main_lip_detection2(frame, YAML_DATA, gray_img, face_model, landmark_model, 
                 talklist = 0
                 Talking = False
                 #print("Not Talking")
-
-        if Talking == True:
-            cv2.putText(frame, "Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 200), 2)
-            #print("Talking")
-        else:
-            cv2.putText(frame, "Not Talking", (frame.shape[1] // 2 - 170, frame.shape[0] // 2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 200, 0), 2)
-            #print("Not talking")
-
         if distancevorige == lip_dist and breedtemondvorige == breedtemond:
             Talking = False
+
+        if YAML_DATA['display_lip_output']:
+            if Talking:
+                cv2.putText(frame, "Talking", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 0), 2)
+                #print("Talking")
+            else:
+                cv2.putText(frame, "Not Talking", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 200), 2)
+            #print("Not talking")
+
         distancevorige = lip_dist
         breedtemondvorige = breedtemond
 

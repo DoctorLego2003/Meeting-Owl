@@ -3,15 +3,23 @@
 
 # ------SETUP------#
 # gewoon face_detection tonen op output
-display_face_detection: True
+display_face_detection: False
+# vertraagde face_detection tonen van face_recog op output
+display_delayed_detection: False
 # zoomed in windows tonen als extra output
 display_face_detection_zoomed: True
 # namen tonen bij hoofden enz.
 display_face_recognition: True
+# nieuwe personen die toegevoegd zijn aan de database inladen
+import_new_face_encodings: True
 # lip overlay en "talking" indicator tonen
-display_lip_detection: False
+display_lip_detection: True
+# output van lip detectie tonen op scherm
+display_lip_output: True
 # display hand gestures
 display_hand_gestures: False
+# display separte frame for gestures
+display_gesture_frame: False
 # tonen van fps counter
 display_FPS: True
 # ------SETUP------#
@@ -22,14 +30,18 @@ display_FPS: True
 # hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
 
 
+
+# new_face_encoding_pull_time (in !!!seconden!!!)
+new_face_encoding_pull_time: 10
+
 # tracking
-minimum_distance: 500
+minimum_distance: 1000
 tracking_treshhold_low: 15
 tracking_treshhold_high: 50
 
 # lip_detection
 yawn_threshold: 35
-relatief_verschil_waarde: 8
+relatief_verschil_waarde: 45
 zerocount_buffer_count: 20
 
 # gestures

@@ -25,7 +25,7 @@ def intersection(a,b):
 
 def detect_face_orientation(gray_img, face_cascade, profile_cascade):
     faces = []
-    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 4)
+    front_faces = face_cascade.detectMultiScale(gray_img, 1.25, 3)
     left_profile = profile_cascade.detectMultiScale(gray_img, 1.3, 3)
     gray_flipped = cv2.flip(gray_img, 1)
     """
@@ -93,7 +93,7 @@ def distance(point_one, point_two):
         return float('inf')
     [x1, y1, w0, h0] = point_one
     [x2, y2, w1, h1] = point_two
-    dist = ((x2 - x1)**2 + (y2 - y1)**2)**1/2
+    dist = ((x2 - x1)**2 + (y2 - y1)**2)
     return dist
 
 def track(faces, zoomed, YAML_DATA):
@@ -256,6 +256,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
     # print('faces:', faces, len(faces))
     faces = track(faces, zoomed, YAML_DATA)
     show = []
+    bigshow = []
     #check_for_doubles(zoomed)
     #check_for_empty(zoomed)
 
@@ -279,18 +280,26 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
         # print('prev zoomed:', zoomed)
         # print('prev faces:', faces)
+
+        #(x, y, w, h) = faces[i]
+        #cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+
         changed = False
         if zoomed[i][0] != faces[i]:
             c = 0.1
             if len(zoomed[i][0]) == len(faces[i]) and len(faces[i]) != 0:
                 for j in range(4):
                     number = c * faces[i][j] + (1 - c) * zoomed[i][0][j]
+                    '''
                     if int(number) < int(number + 0.5):
                         faces[i][j] = int(number + 1)
                     else:
-                        faces[i][j] = int(number)
+                    '''
+                    faces[i][j] = int(number)
+                
                 changed = True
         #cv2.imshow('faces' + str(i + 1), faces[i])
+
         if zoomed[i][0] != faces[i] or changed:
             if zoomed[i][1] < YAML_DATA['tracking_treshhold_high']:
                 zoomed[i][1] += 1
@@ -298,8 +307,11 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             zoomed[i][1] -= 1
 
         x_start, x_eind, y_start, y_eind = make_frame(img, faces[i])
+        (x, y, w, h) = faces[i]
+
+        #cv2.circle(img, (x,y), 100, (0,0,0), 1)
+
         if YAML_DATA['display_face_detection']:
-            (x, y, w, h) = faces[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
 
         zoomed[i][0] = faces[i]
@@ -319,7 +331,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 b = YAML_DATA['extra_height']
                 x_end = int(x + (1+a)*w)
                 y_end = int(y + (1+b)*h)
-                x_new = x - w
+                x_new = int(x - a * w)
                 if x_end >= len(img[0]):
                     x_end = len(img[0]) - 1
                     x_new = min(len(img[0]) - int((2*a+1)*w), x_new)
@@ -331,7 +343,12 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                         x_end = len(img[0])
                 if y_end > len(img):
                     y_end = len(img) - 1
-                hand_frame = img[y:y_end, x_new:x_end]
+                hand_frame1 = img[y:y_end, x_new:x]
+                hand_frame2 = img[y:y_end, x + w: x_end]
+                hand_frame = np.hstack((hand_frame1, hand_frame2))
+                #hand_frame = cv2.resize(hand_frame,)
+                if len(hand_frame) != 0 and YAML_DATA['display_gesture_frame']:
+                    cv2.imshow('gesture_frame', hand_frame)
                 gesture = main_hand_gestures(hand_frame, YAML_DATA)
                 if gesture != None:
                     zoomed[i][4] = gesture
@@ -352,11 +369,29 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
             # ------LipDetection------#
             # -----DisplayZoomed------#
             if YAML_DATA['display_face_detection_zoomed']:
-                if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                Talk = False
+                if YAML_DATA['display_lip_detection']:
+                    if zoomed[i][2][4]:
+                        Talk = True
+                Gest = False
+                if YAML_DATA['display_hand_gestures']:
+                    if zoomed[i][4]:
+                        Gest = True
+                #if (Talking or (not YAML_DATA['display_lip_detection'])) and (zoomed[i][4] or (not YAML_DATA['display_hand_gestures'])):
+                if Talk or Gest:
                     if len(zoomed[i][3]) == 0:
                         cv2.putText(head_frame, str(i + 1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                     else:
                         cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    bigshow.append(head_frame)
+                else:
+                    head_frame = cv2.resize(head_frame, (200, 200))
+                    if len(zoomed[i][3]) == 0:
+                        cv2.putText(head_frame, str(i + 1), (5, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1,
+                                    cv2.LINE_AA)
+                    else:
+                        cv2.putText(head_frame, zoomed[i][3], (5, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255),
+                                    1, cv2.LINE_AA)
                     show.append(head_frame)
                 #elif not YAML_DATA['display_lip_detection'] and not YAML_DATA['display_hand_gestures']:
                 #    show.append(head_frame)
@@ -372,19 +407,26 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                 x_start, x_eind, y_start, y_eind = make_frame(img, zoomed[i][0])
                 head_frame = cv2.resize(img[y_start: y_eind, x_start: x_eind], (400, 400))
                 if YAML_DATA['display_face_detection_zoomed']:
-                    Talk = True
+                    Talk = False
                     if YAML_DATA['display_lip_detection']:
-                        if not zoomed[i][2][4]:
-                            Talk = False
-                    Gest = True
+                        if zoomed[i][2][4]:
+                            Talk = True
+                    Gest = False
                     if YAML_DATA['display_hand_gestures']:
-                        if not zoomed[i][4]:
-                            Gest = False
-                    if Talk and Gest:
+                        if zoomed[i][4]:
+                            Gest = True
+                    if Talk or Gest:
                         if len(zoomed[i][3]) == 0:
                             cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                         else:
                             cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                        bigshow.append(head_frame)
+                    else:
+                        if len(zoomed[i][3]) == 0:
+                            cv2.putText(head_frame, str(i+1), (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                        else:
+                            cv2.putText(head_frame, zoomed[i][3], (10, 380), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                        head_frame = cv2.resize(head_frame, (200, 200))
                         show.append(head_frame)
                         #if len(zoomed[i][3]) == 0:
                             #cv2.imshow('Zoom in ' + str(i + 1), head_frame)
@@ -394,14 +436,14 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
                     #    cv2.destroyWindow('Zoom in ' + str(i + 1))
             i += 1
         elif zoomed[i][1] == 0:
-            print('trying to remove')
+            #print('trying to remove')
             if cv2.getWindowProperty('Zoom in ' + str(i + 1), cv2.WND_PROP_VISIBLE) > 0:
                 cv2.destroyWindow('Zoom in ' + str(i + 1))
             zoomed.remove(zoomed[i])
 
 
     # print('items in show', len(show))
-    organise(show)
+    organise(bigshow, show)
 
     # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)

@@ -14,6 +14,7 @@ from multiprocessing import Process, freeze_support
 import face_recognition
 
 
+
 # met deze file ander files callen zodat het wat overzichtelijker blijft
 
 # ------face detection------#
@@ -67,32 +68,60 @@ def display_FPS(ptime, frame):
     # print(fps)
     return ptime
 
-def load_encoding_images(images_path):
+def load_encoding_images(images_path, fac):
     """
     Load encoding images from path
     :param images_path:
     :return:
     """
+    # print("fac", fac)
+    # dit zijn facenames en encodings die ingeladen zijn uit de map met images
+    all_loaded_face_names = []
+    new_face_encodings = []
+    new_face_names = []
+    to_be_removed_names = []
+
     # Load Images
     images_path = glob.glob(os.path.join(images_path, "*.*"))
 
-    print("{} encoding images found.".format(len(images_path)))
+    #print("{} encoding images found.".format(len(images_path)))
 
     # Store image encoding and names
     for img_path in images_path:
+
         img = cv2.imread(img_path)
         rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # Get the filename only from the initial file path.
         basename = os.path.basename(img_path)
         (filename, ext) = os.path.splitext(basename)
-        # Get encoding
-        img_encoding = face_recognition.face_encodings(rgb_img)[0]
 
-        # Store file name and file encoding
-        known_face_encodings.append(img_encoding)
-        known_face_names.append(filename)
-    print("Encoding images loaded")
+        all_loaded_face_names.append(filename)
+        # print("fac", fac)
+        # we hebben dus minstens 1 nieuwe naam gevonden -> naam en enc toevoegen aan resp list
+        if filename not in fac:
+            new_face_names.append(filename)
+            img_encoding = face_recognition.face_encodings(rgb_img)[0]
+            new_face_encodings.append(img_encoding)
+            # print("new filename", filename)
+
+
+    # checken of er namen verwijdert zijn
+    for i, known_name in enumerate(fac):
+        # print(known_name)
+        if known_name not in all_loaded_face_names:
+            # niet toevoegen aan lijst, rechtstreeks verwijderen uit die lijst
+            to_be_removed_names.append(known_name)
+            # fac.remove(known_name)
+            # enc.remove(enc[i])
+
+
+    # enc += new_face_encodings
+    # fac += new_face_names
+    # print(enc, fac)
+
+    # return enc, fac
+    return new_face_names, new_face_encodings, to_be_removed_names
 
 def capture_vid(streamer):
     try:
@@ -156,7 +185,7 @@ def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
 
         zoomed_event.set()
         zoomed = zoomed_reciever.recv()
-        print("recieved_zoomed", zoomed)
+        # print("recieved_zoomed", zoomed)
 
 
 
@@ -190,40 +219,81 @@ def face_reco(connectie, event, lock, stream, zoomed_reciever, zoomed_event):
         event.clear()
         event.wait()
 
+def load_new_face_encodings(new_face_enc_sender, new_face_enc_event, YAML_DATA, enc_fac_reciever, enc_fac_event):
+    wait_time = YAML_DATA['new_face_encoding_pull_time']
+    while True:
+        # if cv2.waitKey(2) & 0xff == ord('r'):
+        print("tis gerefreshed")
 
 
-def MAIN(YAML_DATA, ptime):
+        enc_fac_event.set()
+        # [enc, fac] = list(enc_fac_reciever.recv())
+        # dat = list(enc_fac_reciever.recv())  # lijst met 2 lijsten in
+        # fac = [data[1] for data in dat]
+        # enc = [data[0] for data in dat]
+        # enc = dat[0]
+        # fac = dat[1]
+
+        fac = enc_fac_reciever.recv()
+
+        # we willen enkel de nieuwe encodings inladen, en niet de oude opnieuw berekenen
+
+
+        new_face_names, new_face_encodings, to_be_removed_names = load_encoding_images("Programs/images/", fac)
+        # print(known_face_names)
+        print("new_face_names", new_face_names)
+
+        # time.sleep(wait_time)  # neemt als argument miliseconden
+
+
+        # enkel nieuwe encodings en namen doorsturen OPGELET ER IS EEN LIMIET VAN HET AANTAL ENCODINGS DOOR DE PIPE
+        new_face_enc_sender.send((new_face_names, new_face_encodings, to_be_removed_names))
+
+        new_face_enc_event.clear()
+        new_face_enc_event.wait()
+
+def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
     streamer, stream = multiprocessing.Pipe()
     cam = Process(target=capture_vid, args=(streamer, ))
     cam.start()
 
-
     face_encodings = []
     # face_locations = []
     face_data = []
-    sent_zoomed = []
+    # sent_zoomed = []
+
+    fac = []
+    enc = []
 
     lock = multiprocessing.RLock()
     event = multiprocessing.Event()
     event.set()
 
+    new_face_enc_event = multiprocessing.Event()
+    new_face_enc_event.set()
 
-
-
-    # test
+    # test, MOET ALTIJD RUNNEN, DUS NOOIT IN EEN IF STATEMENT ZETTEN
     zoomed_reciever, zoomed_sender = multiprocessing.Pipe()
     zoomed_event = multiprocessing.Event()
     zoomed_event.set()
 
+    enc_fac_reciever, enc_fac_sender = multiprocessing.Pipe()
+    enc_fac_event = multiprocessing.Event()
+    enc_fac_event.set()
 
 
-
+    if YAML_DATA['import_new_face_encodings'] == True:
+        new_face_enc_reciever, new_face_enc_sender = multiprocessing.Pipe()
+        # face_enc_loader = Process(target=load_new_face_encodings, args=(new_face_enc_sender, known_face_names) )
+        face_enc_loader_process = Process(target=load_new_face_encodings, args=(new_face_enc_sender, new_face_enc_event, YAML_DATA, enc_fac_reciever, enc_fac_event))
+        face_enc_loader_process.start()
 
     if YAML_DATA['display_face_recognition'] == True:
         face_data_reciever, face_data_sender = multiprocessing.Pipe()
         # print(face_data_reciever, face_data_sender)
         proces = Process(target=face_reco, args=(face_data_sender, event, lock, stream, zoomed_reciever, zoomed_event))
         proces.start()
+
 
     # lock.acquire()
     # frame = stream.recv()
@@ -248,11 +318,55 @@ def MAIN(YAML_DATA, ptime):
         # zoomed has been changed
         # print("zoomed in main na change", zoomed)
 
+        # IS NIET NODIG WANT DIE PAST GWN DE GLOBALE VAR AAN
+
+        if YAML_DATA['import_new_face_encodings'] == True:
+            if not new_face_enc_event.is_set():
+                dat = list(new_face_enc_reciever.recv())
+                # met dat dat de namen en
+                new_face_enc_event.set()
+                # print("dat", dat)
+                # ALS HET HIER ERRORT, TEVEEL IMAGES INGELADEN
+                nfnam, nfenc, tbrn = dat[0], dat[1], dat[2]
+
+                removed_counter = 0
+                tbrn.sort()
+                for i, removed_name in enumerate(tbrn):
+                    fac.remove(removed_name)
+                    enc.remove(enc[i - removed_counter])
+                    removed_counter += 1
+
+                # print("fac 1", fac)
+                fac += nfnam
+                enc += nfenc
+                # print("fac 2", fac)
+
+                known_face_names = fac
+                known_face_encodings = enc
+
+                # checken of er namen verwijdert zijn
+                # for i, known_name in enumerate(fac):
+                #     # print(known_name)
+                #     if known_name not in known_face_names:
+                #         # niet toevoegen aan lijst, rechtstreeks verwijderen uit die lijst
+                #         # removed_names.append(known_name)
+                #         print("removing", known_name, enc[i])
+                #         fac.remove(known_name)
+                #         enc.remove(enc[i])
+                #
+                # fac += nfnam
+                # enc += nfenc
+                #
+                # print("fac, enc", fac)
+
+                # known_face_names = fac
+                # known_face_encodings = enc
+
+                # print(enc, fac)
 
 
 
         if YAML_DATA['display_face_recognition'] == True:
-
             if not event.is_set():
                 face_data = list(face_data_reciever.recv())  # hier ontvangt die de locations van de gezichten en de encodings die hij gaat matchen aan shit
 
@@ -303,32 +417,49 @@ def MAIN(YAML_DATA, ptime):
                 # print(name_coord_linking_list)
                 # print(name)
 
+                if YAML_DATA['display_delayed_detection']:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
+                    # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+                    cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
 
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 200), 2)
-                # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-                cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 2)
-
-            print(name_coord_linking_list)
+            #print(name_coord_linking_list)
 
             for i in range(len(zoomed)):
                 for j in range(len(name_coord_linking_list)):
 
                     # print(name_coord_linking_list[j][0])
                     # (face_location, name)
-                    print(name_coord_linking_list[j][0])
+                    # print(name_coord_linking_list[j][0])
                     if zoomed[i][5] == list(name_coord_linking_list[j][0]):
                         zoomed[i][3] = name_coord_linking_list[j][1]
 
-        print("last_print", zoomed)
+        # print("last_print", zoomed)
 
 
+        # if cv2.waitKey(2) & 0xff == ord('r'):
+        #     print("waiting for 10 seconds")
+        #     time.sleep(10)
+
+
+        if enc_fac_event.is_set() and cv2.waitKey(4) & 0xff == ord('r'):
+            # enc = copy.deepcopy(known_face_encodings)
+            # fac = copy.deepcopy(known_face_names)
+            # enc_fac_sender.send((enc, fac))
+            # enkel namen van huidige personen doorsturen
+
+
+
+            fac = copy.deepcopy(known_face_names)
+            enc = copy.deepcopy(known_face_encodings)
+            enc_fac_sender.send(fac)
+            enc_fac_event.clear()
 
         if zoomed_event.is_set():
             sent_zoomed = copy.deepcopy(zoomed)  # verzonden zoomed coordinaten
             zoomed_sender.send(sent_zoomed)
             zoomed_event.clear()
 
-            print("sent_zoomed", sent_zoomed)
+            # print("sent_zoomed", sent_zoomed)
             for i in range(len(zoomed)):
                 zoomed[i][5] = sent_zoomed[i][0]  # dit add de fixed coodinates voordat de face_recognition gedaan wordt
 
@@ -339,7 +470,6 @@ def MAIN(YAML_DATA, ptime):
             # testevent.set()
         # testevent.clear()
         # testevent.wait()
-
 
 
 
@@ -359,18 +489,16 @@ def MAIN(YAML_DATA, ptime):
 
         cv2.imshow('Live: ', frame)
 
-        print("---------------")
+        # print("---------------")
 
 
         # k = cv2.waitKey(30) & 0xff
         # if k == ord('q'):
         #     break
-        if cv2.waitKey(30) & 0xff == ord('q') or cv2.waitKey(1) & 0xFF == 27:
+        if cv2.waitKey(4) & 0xff == ord('q') or cv2.waitKey(4) & 0xFF == 27:
             break
     cap.release()
     cv2.destroyAllWindows()
-
-
 
 
 if __name__ == "__main__":
@@ -382,6 +510,7 @@ if __name__ == "__main__":
 
     # xml files
     face_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_frontalface_default.xml')
+    # face_cascade = cv2.CascadeClassifier("Programs/xml/haarcascade_frontalface_alt2.xml")
     profile_cascade = cv2.CascadeClassifier('Programs/xml/haarcascade_profileface.xml')
 
     # face shit voor lip detection
@@ -401,8 +530,13 @@ if __name__ == "__main__":
 
     YAML_DATA = load_YAML()
 
-    load_encoding_images("Programs/images/")
+
+    # runnen omdat we sowieso 1 keer deze shit nodig hebben
+    default_face_names, default_face_encodings, Default_to_be_removed_names = load_encoding_images("Programs/images/", known_face_names)
+    known_face_names = default_face_names
+    known_face_encodings = default_face_encodings
     # print(known_face_names)
+    print("Encoding images loaded")
 
 
 
@@ -426,5 +560,7 @@ if __name__ == "__main__":
     # face_locations = face_recognition.face_locations(frame)
     # face_encodings = face_recognition.face_encodings(frame, face_locations)
     # cap.release()
-    print("run MAIN")
-    MAIN(YAML_DATA, ptime)
+
+
+    # print("run MAIN")
+    MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names)
