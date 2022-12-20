@@ -441,7 +441,7 @@ def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
         #     time.sleep(10)
 
 
-        if enc_fac_event.is_set() and cv2.waitKey(1) & 0xff == ord('r'):
+        if enc_fac_event.is_set() and cv2.waitKey(4) & 0xff == ord('r'):
             # enc = copy.deepcopy(known_face_encodings)
             # fac = copy.deepcopy(known_face_names)
             # enc_fac_sender.send((enc, fac))
@@ -495,7 +495,7 @@ def MAIN(YAML_DATA, ptime, known_face_encodings, known_face_names):
         # k = cv2.waitKey(30) & 0xff
         # if k == ord('q'):
         #     break
-        if cv2.waitKey(2) & 0xff == ord('q') or cv2.waitKey(2) & 0xFF == 27:
+        if cv2.waitKey(4) & 0xff == ord('q') or cv2.waitKey(4) & 0xFF == 27:
             break
     cap.release()
     cv2.destroyAllWindows()

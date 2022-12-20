@@ -443,7 +443,7 @@ def main_tracking(img, YAML_DATA, zoomed, gray_img, face_cascade, profile_cascad
 
 
     # print('items in show', len(show))
-    organise(bigshow,show)
+    organise(bigshow, show)
 
     # print('zoomed:', zoomed)
     # cv2.imshow('Live: ', img)
