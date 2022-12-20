@@ -7,9 +7,11 @@ display_face_detection: False
 # vertraagde face_detection tonen van face_recog op output
 display_delayed_detection: False
 # zoomed in windows tonen als extra output
-display_face_detection_zoomed: True
+display_face_detection_zoomed: False
 # namen tonen bij hoofden enz.
 display_face_recognition: True
+# nieuwe personen die toegevoegd zijn aan de database inladen
+import_new_face_encodings: True
 # lip overlay en "talking" indicator tonen
 display_lip_detection: True
 # output van lip detectie tonen op scherm
@@ -27,6 +29,10 @@ display_FPS: True
 # ------CONSTANTEN------#
 # hieronder gewoon constanten toevoegen zodat we ze makkelijk kunnen aanpassen
 
+
+
+# new_face_encoding_pull_time (in !!!seconden!!!)
+new_face_encoding_pull_time: 10
 
 # tracking
 minimum_distance: 1000
