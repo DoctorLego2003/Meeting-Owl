@@ -3,9 +3,9 @@
 
 # ------SETUP------#
 # gewoon face_detection tonen op output
-display_face_detection: True
+display_face_detection: False
 # zoomed in windows tonen als extra output
-display_face_detection_zoomed: True
+display_face_detection_zoomed: False
 # namen tonen bij hoofden enz.
 display_face_recognition: True
 # nieuwe personen die toegevoegd zijn aan de database inladen
@@ -26,7 +26,7 @@ display_FPS: True
 
 
 # new_face_encoding_pull_time (in !!!seconden!!!)
-new_face_encoding_pull_time: 60  # eens in de 5 minuten fz
+new_face_encoding_pull_time: 10
 
 # tracking
 minimum_distance: 500
